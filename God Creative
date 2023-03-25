@@ -1,6 +1,6 @@
 --------Auto Update-------- https://aimware.net/forum/thread/151605
 local SCRIPT_FILE_NAME = GetScriptName();
-local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/OwlMan42069/Aimware-Luas/main/Hentai%20Killsay%20Deathsay.lua";
+local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/VngGodCreative/godcreative-lua/main/God%20Creative";
 local VERSION_FILE_ADDR = "https://pastebin.com/raw/ccRYTevK";
 local VERSION_NUMBER = "1.2";
 local version_check_done = false;

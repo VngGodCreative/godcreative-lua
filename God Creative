@@ -1,0 +1,2279 @@
+--------Auto Update-------- https://aimware.net/forum/thread/151605
+local SCRIPT_FILE_NAME = GetScriptName();
+local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/OwlMan42069/Aimware-Luas/main/Hentai%20Killsay%20Deathsay.lua";
+local VERSION_FILE_ADDR = "https://pastebin.com/raw/ccRYTevK";
+local VERSION_NUMBER = "1.2";
+local version_check_done = false;
+local update_downloaded = false;
+local update_available = false;
+local up_to_date = false;
+local updaterfont1 = draw.CreateFont("Bahnschrift", 18);
+local updaterfont2 = draw.CreateFont("Bahnschrift", 14);
+local updateframes = 0;
+local fadeout = 0;
+local spacing = 0;
+local fadein = 0;
+
+callbacks.Register( "Draw", "handleUpdates", function()
+	if updateframes < 5.5 then
+		if up_to_date or updateframes < 0.25 then
+			updateframes = updateframes + globals.AbsoluteFrameTime();
+			if updateframes > 5 then
+				fadeout = ((updateframes - 5) * 510);
+			end
+			if updateframes > 0.1 and updateframes < 0.25 then
+				fadein = (updateframes - 0.1) * 4500;
+			end
+			if fadein < 0 then fadein = 0 end
+			if fadein > 650 then fadein = 650 end
+			if fadeout < 0 then fadeout = 0 end
+			if fadeout > 255 then fadeout = 255 end
+		end
+		if updateframes >= 0.25 then fadein = 650 end
+		for i = 0, 600 do
+			local alpha = 200-i/3 - fadeout;
+			if alpha < 0 then alpha = 0 end
+			draw.Color(15,15,15,alpha);
+			draw.FilledRect(i - 650 + fadein, 0, i+1 - 650 + fadein, 30);
+			draw.Color(0, 180, 255,alpha);
+			draw.FilledRect(i - 650 + fadein, 30, i+1 - 650 + fadein, 31);
+		end
+		draw.SetFont(updaterfont1);
+		draw.Color(0,180,255,255 - fadeout);
+		draw.Text(7 - 650 + fadein, 7, "GOD Creative ");
+		draw.Color(225,225,225,255 - fadeout);
+		draw.Text(7 + draw.GetTextSize("GOD Creative ") - 650 + fadein, 7, "Script");
+		draw.Color(0,180,255,255 - fadeout);
+		draw.Text(7 + draw.GetTextSize("GOD Creative Script ") - 650 + fadein, 7, "\\");
+		spacing = draw.GetTextSize("GOD Creative Script  \\  ");
+		draw.SetFont(updaterfont2);
+		draw.Color(225,225,225,255 - fadeout);
+	end
+
+    if (update_available and not update_downloaded) then
+		draw.Text(7 + spacing - 650 + fadein, 9, "Downloading latest version.");
+        local new_version_content = http.Get(SCRIPT_FILE_ADDR);
+        local old_script = file.Open(SCRIPT_FILE_NAME, "w");
+        old_script:Write(new_version_content);
+        old_script:Close();
+        update_available = false;
+        update_downloaded = true;
+	end
+	
+    if (update_downloaded) and updateframes < 5.5 then
+		draw.Text(7 + spacing - 650 + fadein, 9, "Update available, please reload the script.");
+    end
+
+    if (not version_check_done) then
+        version_check_done = true;
+		local version = http.Get(VERSION_FILE_ADDR);
+		version = string.gsub(version, "\n", "");
+		if (version ~= VERSION_NUMBER) then
+            update_available = true;
+		else 
+			up_to_date = true;
+		end
+	end
+	
+	if up_to_date and updateframes < 5.5 then
+		draw.Text(7 + spacing - 650 + fadein, 9, "Successfully loaded latest version: v" .. VERSION_NUMBER);
+	end
+end)
+
+--------GUI Stuff--------
+local misc_ref = gui.Reference("Misc")
+local tab = gui.Tab(misc_ref, "GOD Creative ", ("GOD Creative v" .. VERSION_NUMBER))
+
+local left_tab = gui.Groupbox(tab, "Watermark", 10, 15, 310, 400)
+local left_tab3 = gui.Groupbox(tab, "Misc", 10, 140, 310, 400)
+local right_tab = gui.Groupbox(tab, "Game-Chat", 325, 15, 305, 400)
+
+local watermark = gui.Checkbox(left_tab, "enable.watermark", "Enable Watermark", false)
+local ui_color = gui.ColorPicker(left_tab, "ui_color", "UI color", 125, 125, 230)
+local EngineRadar = gui.Checkbox(left_tab3, "engine.radar", "Engine Radar", false)
+local ForceCrosshair = gui.Checkbox(left_tab3, "force.crosshair", "Force Crosshair", false)
+local RecoilCrosshair = gui.Checkbox(left_tab3, "recoil.crosshair", "Recoil Crosshair", false)
+local UnlockInventory = gui.Checkbox(left_tab3, "Unlock.Inventory", "Inventory Unlock", false)
+
+local enable_chatcmds = gui.Checkbox(right_tab, "enable.chatcmds", "Enable Chat Commands", false)
+local chat_commands = gui.Multibox(right_tab, "Select Chat Commands")
+local enable_ranks = gui.Checkbox(chat_commands, "enable.ranks", "!ranks", false)
+local enable_roll = gui.Checkbox(chat_commands, "enable.roll", "!roll", false)
+local enable_8ball = gui.Checkbox(chat_commands, "enable.8ball", "!8ball", false)
+local enable_gaydar = gui.Checkbox(chat_commands, "enable.gaydar", "!gay", false)
+local enable_coin_flip = gui.Checkbox(chat_commands, "enable.flip", "!flip", false)
+local enable_anime = gui.Checkbox(chat_commands, "enable.anime", "!anime", false)
+local ranks_mode = gui.Combobox(right_tab, "ranks.mode", "Select Chat Mode (Ranks)", "Team Chat", "All Chat")
+
+--------PannoramaUtil--------
+panorama.RunScript([[
+    var ep_globals = {
+        
+        handlers: {},
+
+        elements: {},
+
+        config: {
+            prefix: '!',
+            premium: true,
+        },
+
+        update_config: function(type, value) {
+            ep_globals.config[type] = value;
+        },
+
+        symbols: {
+            bullet: '\u{2022}',
+            check: '\u{2714}',
+            times: '\u{2716}',
+            warning: '\u{26A0}',
+            location: '\u{25BC}',
+            ball8: '\u{2791}',
+            dice: ['\u{2680}', '\u{2681}', '\u{2682}', '\u{2683}', '\u{2684}', '\u{2685}']
+        },
+
+        regex: {
+            steamid64: /^(7656[0-9]{13})$/i,
+            lobby_index: /^([1-9]{1})$/i,
+            friend_code: /^(\w{5}-\w{4})$/i,
+            competitive: /^(mm|comp.{0,7})$/i,
+            wingman: /^(wm|wing.{0,3})$/i
+        },
+
+        locations: {
+            AF: "Áp-ga-ni-xtan (Afghanistan)",
+            AX: "Quần đảo Aland (Åland Islands)",
+            AL: "anbani (Albania)",
+            DZ: "An-giê-ri (Algeria)",
+            AS: "American Samoa",
+            AD: "Andorra",
+            AO: "Ăng-gô-la (Angola)",
+            AI: "Anguilla",
+            AQ: "Nam Cực (Antarctica)",
+            AG: "Antigua và Barbuda (Antigua and Barbuda)",
+            AR: "Ác-hen-ti-na (Argentina)",
+            AM: "Ác-mê-ni-a (Armenia)",
+            AW: "Aruba",
+            AU: "Châu Úc (Australia)",
+            AT: "Áo (Austria)",
+            AZ: "A-déc-bai-gian (Azerbaijan)",
+            BS: "Bahamas",
+            BH: "Bahrain",
+            BD: "Băng-la-đét (Bangladesh)",
+            BB: "Barbados",
+            BY: "Bêlarut (Belarus)",
+            BE: "nước Bỉ (Belgium)",
+            BZ: "Belize",
+            BJ: "Bénin (Benin)",
+            BM: "Bermuda",
+            BT: "Bu-tan (Bhutan)",
+            BO: "Bôlivia (Bolivia)",
+            BA: "Bosnia và Herzegovina (Bosnia and Herzegovina)",
+            BW: "Botswana",
+            BV: "Đảo Bouvet (Bouvet Island)",
+            BR: "Brazil",
+            IO: "Lãnh thổ Ấn Độ Dương thuộc Anh (British Indian Ocean Territory)",
+            BN: "Vương quốc Bru-nây (Brunei Darussalam)",
+            BG: "Bulgari (Bulgaria)",
+            BF: "Burkina Faso",
+            BI: "Burundi",
+            KH: "Campuchia (Cambodia)",
+            CM: "Cameroon",
+            CA: "Camerun (Canada)",
+            CV: "Mũi Verde (Cape Verde)",
+            KY: "Quần đảo Cayman (Cayman Islands)",
+            CF: "Cộng hòa trung phi (Central African Republic)",
+            TD: "Tchad (Chad)",
+            CL: "Chi-lê (Chile)",
+            CN: "Trung Quốc (China)",
+            CX: "Đảo giáng sinh (Christmas Island)",
+            CC: "Quần đảo Cocos Keeling (Cocos Keeling Islands)",
+            CO: "Cô-lôm-bi-a (Colombia)",
+            KM: "Comoros",
+            CG: "Công-gô (Congo)",
+            CD: "Công-gô, Cộng hòa Dân chủ (Congo, The Democratic Republic)",
+            CK: "Quần đảo Cook (Cook Islands)",
+            CR: "Cô-xta Ri-ca (Costa Rica)",
+            CI: "Bờ Biển Ngà (Cote D'Ivoire)",
+            HR: "Croatia",
+            CU: "Cuba",
+            CY: "Síp (Cyprus)",
+            CZ: "Cộng hòa Séc (Czech Republic)",
+            DK: "Đan mạch (Denmark)",
+            DJ: "Djibouti",
+            DM: "Đô-mi-ni-ca (Dominica)",
+            DO: "Cộng hòa Dominica (Dominican Republic)",
+            EC: "Ecuador",
+            EG: "Ai Cập (Egypt)",
+            SV: "El Salvador",
+            GQ: "Equatorial Guinea",
+            ER: "Eritrea",
+            EE: "Estonia",
+            ET: "Ê-ti-ô-pi-a (Ethiopia)",
+            FK: "Quần đảo Falkland Malvinas (Falkland Islands Malvinas)",
+            FO: "Quần đảo Faroe (Faroe Islands)",
+            FJ: "Fiji",
+            FI: "Phần Lan (Finland)",
+            FR: "Pháp (France)",
+            GF: "Guiana thuộc Pháp (French Guiana)",
+            PF: "Polynésie thuộc Pháp (French Polynesia)",
+            TF: "Lãnh thổ phía Nam của Pháp (French Southern Territories)",
+            GA: "Gabon",
+            GM: "Gambia",
+            GE: "Gruzia (Georgia)",
+            DE: "Đức (Germany)",
+            GH: "Gana (Ghana)",
+            GI: "Gibraltar",
+            GR: "Hy Lạp (Greece)",
+            GL: "Vùng đất xanh (Greenland)",
+            GD: "Grenada",
+            GP: "Guadeloupe",
+            GU: "Đảo Guam (Guam)",
+            GT: "Goa-tê-ma-la (Guatemala)",
+            GG: "Du kích (Guernsey)",
+            GN: "Guinea",
+            GW: "Guiné-Bissau (Guinea-Bissau)",
+            GY: "Guyana",
+            HT: "Haiti",
+            HM: "Đảo Heard và Quần đảo Mcdonald (Heard Island and Mcdonald Islands)",
+            VA: "Tòa thánh - Quốc gia thành phố Vatican (Holy See - Vatican City State)",
+            HN: "Honduras",
+            HK: "Hồng Kông (Hong Kong)",
+            HU: "Hungary",
+            IS: "Iceland",
+            IN: "Ấn Độ (India)",
+            ID: "Indonesia",
+            IR: "Iran, Cộng hòa Hồi giáo (Iran, Islamic Republic)",
+            IQ: "I-rắc (Iraq)",
+            IE: "Ireland",
+            IM: "Đảo Man (Isle of Man)",
+            IL: "Israel",
+            IT: "Ý (Italy)",
+            JM: "Gia-mai-ca (Jamaica)",
+            JP: "Nhật Bản (Japan)",
+            JE: "Jersey",
+            JO: "Jordan",
+            KZ: "Ca-dắc-xtan (Kazakhstan)",
+            KE: "Kê-ni-a (Kenya)",
+            KI: "Kiribati",
+            KP: "Hàn Quốc, Cộng hòa Dân chủ Nhân dân (Korea, Democratic People'S Republic)",
+            KR: "Cộng hòa Hàn Quốc (Korea, Republic)",
+            KW: "Cô-oét (Kuwait)",
+            KG: "Kyrgyzstan",
+            LA: "Cộng hòa Dân chủ nhân dân Lào (Lao People'S Democratic Republic)",
+            LV: "Lát-vi-a (Latvia)",
+            LB: "Liban (Lebanon)",
+            LS: "Lesotho",
+            LR: "Liberia",
+            LY: "Libyan Arab Jamahiriya",
+            LI: "Liechtenstein",
+            LT: "Litva (Lithuania)",
+            LU: "Lúc-xăm-bua (Luxembourg)",
+            MO: "Macao",
+            MK: "Macedonia, Cộng hòa Nam Tư cũ (Macedonia, The Former Yugoslav Republic)",
+            MG: "Madagascar",
+            MW: "Ma-lai-xi-a (Malawi)",
+            MY: "Ma-lai-xi-a (Malaysia)",
+            MV: "Ma-đi-vơ (Maldives)",
+            ML: "Ma-li (Mali)",
+            MT: "Malta",
+            MH: "Đảo Marshall (Marshall Islands)",
+            MQ: "Martinique",
+            MR: "Mauritania",
+            MU: "Mauritius",
+            YT: "Mayotte",
+            MX: "Mê hi cô (Mexico)",
+            FM: "Liên bang Micronesia (Micronesia, Federated States)",
+            MD: "Cộng hòa Moldova (Moldova Republic)",
+            MC: "Monaco",
+            MN: "Mông Cổ (Mongolia)",
+            MS: "Montserrat",
+            MA: "Ma-rốc (Morocco)",
+            MZ: "Mozambique",
+            MM: "Myanmar",
+            NA: "Namibia",
+            NR: "Nauru",
+            NP: "Nê-pan (Nepal)",
+            NL: "Hà Lan (Netherlands)",
+            AN: "Antille thuộc Hà Lan (Netherlands Antilles)",
+            NC: "Caledonia mới (New Caledonia)",
+            NZ: "Tân Tây Lan (New Zealand)",
+            NI: "Ni-ca-ra-goa (Nicaragua)",
+            NE: "Ni-giê (Niger)",
+            NG: "Ni-giê-ri-a (Nigeria)",
+            NU: "Niue",
+            NF: "Đảo Norfolk (Norfolk Island)",
+            MP: "Quần đảo Bắc Mariana (Northern Mariana Islands)",
+            NO: "Na Uy (Norway)",
+            OM: "Ô-man (Oman)",
+            PK: "Pa-ki-xtan (Pakistan)",
+            PW: "Palau",
+            PS: "Lãnh thổ Palestine, bị chiếm đóng (Palestinian Territory, Occupied)",
+            PA: "Pa-na-ma (Panama)",
+            PG: "Papua New Guinea",
+            PY: "Paraguay",
+            PE: "Pêru (Peru)",
+            PH: "Phi líp pin (Philippines)",
+            PN: "Cái hố (Pitcairn)",
+            PL: "Ba Lan (Poland)",
+            PT: "Bồ Đào Nha (Portugal)",
+            PR: "Puerto Rico",
+            QA: "Ca-ta (Qatar)",
+            RE: "Đoàn tụ (Reunion)",
+            RO: "Ru-ma-ni (Romania)",
+            RU: "Liên Bang Nga (Russian Federation)",
+            RW: "RWANDA",
+            SH: "Thánh Helena (Saint Helena)",
+            KN: "Saint Kitts và Nevis (Saint Kitts and Nevis)",
+            LC: "Saint Lucia",
+            PM: "Thánh Pierre và Miquelon (Saint Pierre and Miquelon)",
+            VC: "Saint Vincent và Grenadines (Saint Vincent and the Grenadines)",
+            WS: "Samoa",
+            SM: "San Ma-ri-nô (San Marino)",
+            ST: "Sao Tome và Principe (Sao Tome and Principe)",
+            SA: "Ả Rập Saudi (Saudi Arabia)",
+            SN: "Sénégal (Senegal)",
+            CS: "Serbia và Montenegro (Serbia and Montenegro)",
+            SC: "Seychelles",
+            SL: "Sierra Leone",
+            SG: "Singapore",
+            SK: "Slovakia",
+            SI: "Slovenia",
+            SB: "Quần đảo Solomon (Solomon Islands)",
+            SO: "Somali (Somalia)",
+            ZA: "Nam Phi (South Africa)",
+            GS: "Phía Nam Georgia và Phía nam quần đảo Sandwich (South Georgia and the South Sandwich Islands)",
+            ES: "Tây ban nha (Spain)",
+            LK: "Sri Lanka",
+            SD: "Su-đăng (Sudan)",
+            SR: "Suriname",
+            SJ: "Svalbard and Jan Mayen",
+            SZ: "Swaziland",
+            SE: "Thụy Điển (Sweden)",
+            CH: "Thụy sĩ (Switzerland)",
+            SY: "Cộng Hòa Arab Syrian (Syrian Arab Republic)",
+            TW: "Đài Loan, tỉnh Trung Quốc (Taiwan, Province of China)",
+            TJ: "Tajikistan",
+            TZ: "Cộng hòa Thống nhất Tanzania (Tanzania, United Republic)",
+            TH: "Thái Lan (Thailand)",
+            TL: "Đông Timor (Timor-Leste)",
+            TG: "Togo",
+            TK: "Tokelau",
+            TO: "Tonga",
+            TT: "Trinidad and Tobago",
+            TN: "Tunisia",
+            TR: "Thổ Nhĩ Kỳ (Turkey)",
+            TM: "Tuốc-mê-ni-xtan (Turkmenistan)",
+            TC: "Quần đảo Turks và Caicos (Turks and Caicos Islands)",
+            TV: "Tuvalu",
+            UG: "Uganda",
+            UA: "Ukraine",
+            AE: "Các Tiểu Vương Quốc Ả Rập Thống Nhất (United Arab Emirates)",
+            GB: "Vương quốc Anh (United Kingdom)",
+            US: "Hoa Kỳ (United States)",
+            UM: "Quần đảo nhỏ xa xôi của Hoa Kỳ (United States Minor Outlying Islands)",
+            UY: "U-ru-goay (Uruguay)",
+            UZ: "U-dơ-bê-ki-xtan (Uzbekistan)",
+            VU: "Vanuatu",
+            VE: "Venezuela",
+            VN: "Việt Nam (Viet Nam)",
+            VG: "Quần đảo Virgin thuộc Anh (Virgin Islands, British)",
+            VI: "Quần đảo Virgin, Hoa Kỳ (Virgin Islands, U.S)",
+            WF: "Wallis and Futuna",
+            EH: "Phía tây Sahara (Western Sahara)",
+            YE: "Y-ê-men (Yemen)",
+            ZM: "Zambia",
+            ZW: "Zimbabuê (Zimbabwe)"
+        },
+
+        create: function(content, panels) {
+            panels.forEach((x) => {
+                let el = content.FindChildTraverse(x.id);
+                if (typeof el !== "undefined" && el !== null) return;
+
+                content.BCreateChildren(x.panel);
+                x.scripts.forEach(y => y(content));
+            });
+
+            return true;
+        },
+
+        destroy: function(content, panels) {
+            panels.forEach((x) => {
+                let el = content.FindChildTraverse(x.id);
+                if (typeof el === "undefined" || el === null) return;
+
+                el.DeleteAsync(0.0);
+            });
+
+            return true;
+        },
+
+        register_events: function(event, func) {
+            if (!ep_globals.handlers[event]) {
+                ep_globals.handlers[event] = [];
+            }
+
+            ep_globals.handlers[event].push(func);
+        },
+
+        unregister_events: function() {
+            for (const [key, value] of Object.entries(ep_globals.handlers)) {
+                for (const v of value) {
+                    $.UnregisterForUnhandledEvent(key, v);
+                    ep_globals.handlers[key] = ep_globals.handlers[key].filter((x) => x != v);
+                for (const [key, value] of Object.entries(ep_globals.elements)) {
+                    value(); // destroy elements
+                };
+                }
+            }
+        },
+
+        apply_styles: function(target, styles) {
+            for (const [key, value] of Object.entries(styles)) {
+                target.style[key] = value;
+            }
+        },
+
+        open_ad: function() {
+            SteamOverlayAPI.OpenExternalBrowserURL('aimware.net');
+        },
+    };
+
+    var ep_time = (function()
+    {
+        const month_names = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
+        const get_formatted_date = function(date, preformatted = false, hide_year = false) {
+            const day = date.getDate();
+            const month = month_names[date.getMonth()];
+            const year = date.getFullYear();
+            const hours = date.getHours();
+            let minutes = date.getMinutes();
+
+            if (minutes < 10) {
+                // Adding leading zero to minutes
+                minutes = `0${ minutes }`;
+            }
+
+            if (preformatted) {
+                // Today at 10:20
+                // Yesterday at 10:20
+                return `${ preformatted } at ${ hours }:${ minutes }`;
+            }
+
+            if (hide_year) {
+                // 10. January at 10:20
+                return `${ day }. ${ month } at ${ hours }:${ minutes }`;
+            }
+
+            // 10. January 2017. at 10:20
+            return `${ day }. ${ month } ${ year } at ${ hours }:${ minutes }`;
+        };
+
+        const _ago = function(date) {
+            if (!date) {
+                return null;
+            }
+
+            const this_date = typeof date === 'object' ? date : new Date(date);
+            const day_in_ms = 86400000; // 24 * 60 * 60 * 1000
+            const today = new Date();
+            const yesterday = new Date(today - day_in_ms);
+            const seconds = Math.round((today - this_date) / 1000);
+            const minutes = Math.round(seconds / 60);
+            const is_today = today.toDateString() === date.toDateString();
+            const is_yesterday = yesterday.toDateString() === date.toDateString();
+            const is_this_year = today.getFullYear() === date.getFullYear();
+
+
+            if (seconds < 5) {
+                return 'now';
+            } else if (seconds < 60) {
+                return `${ seconds } seconds ago`;
+            } else if (seconds < 90) {
+                return 'about a minute ago';
+            } else if (minutes < 60) {
+                return `${ minutes } minutes ago`;
+            } else if (is_today) {
+                return get_formatted_date(this_date, 'Today'); // Today at 10:20
+            } else if (is_yesterday) {
+                return get_formatted_date(this_date, 'Yesterday'); // Yesterday at 10:20
+            } else if (is_this_year) {
+                return get_formatted_date(this_date, false, true); // 10. January at 10:20
+            }
+
+            return get_formatted_date(this_date); // 10. January 2017. at 10:20
+        };
+
+        return {
+            ago: _ago
+        };
+    })();
+
+    ep_steam_profile = function(profile) {
+        let _ = profile;
+
+        const persona = [
+            'Offline',
+            'Online',
+            'Busy',
+            'Away',
+            'Snooze',
+            'looking to trade',
+            'looking to play'
+        ];
+
+        const visiblity = {
+            1: 'Private',
+            3: 'Public'
+        };
+
+        const _this = function() {
+            return _;
+        };
+
+        const _id = function() {
+            return _.steamid;
+        };
+
+        const _name = function(method) {
+            switch (method) {
+                case 'custom':
+                    const matches = _url().match(/steamcommunity.com\/(id|profiles)\/(.*)[/]/i);
+                    $.Msg(matches);
+                    return matches[2];
+                    break;
+
+                default:
+                    return _.personaname;
+                    break;
+            }
+        };
+
+        const _url = function(method) {
+            switch (method) {
+                case 'id':
+                    return `https://steamcommunity.com/profiles/${_id()}`
+                    break;
+
+                default:
+                    return _.profileurl;
+                    break;
+            }
+        };
+
+        const _avatar = function(method) {
+            switch (method) {
+                case 'small':
+                    return _.avatar;
+                    break;
+
+                case 'medium':
+                    return _.avatarmedium;
+                    break;
+
+                case 'hash':
+                    return _.avatarhash;
+                    break;
+
+                default:
+                    return _.avatarfull;
+                    break;
+            }
+        };
+
+        const _persona_state = function() {
+            return persona[_.profilestate];
+        };
+
+        const _visibility_state = function() {
+            return visibility[_.communityvisibilitystate];
+        };
+
+        // useless
+        const _profile_state = function() {
+            return typeof _.profilestate === 'undefined' ? 0 : 1;
+        };
+
+        const _last_online = function() {
+            return ep_time.ago(new Date(_.lastlogoff * 1000));
+        };
+
+        const _comment_state = function() {
+            return typeof _.commentpermission === 'undefined' ? 0 : 1;
+        };
+
+        const _created = function() {
+            return typeof _.timecreated === 'undefined' ? false : ep_time.ago(new Date(_.timecreated * 1000));
+        };
+
+        const _primary_clanid = function() {
+            return typeof _.primaryclanid === 'undefined' ? false : _.primaryclanid;
+        };
+
+        return {
+            _: _this,
+            id: _id,
+            name: _name,
+            url: _url,
+            avatar: _avatar,
+            persona_state: _persona_state,
+            visibility_state: _visibility_state,
+            profile_state: _profile_state,
+            last_online: _last_online,
+            comment_state: _comment_state,
+            created: _created,
+            primary_clanid: _primary_clanid
+        };
+    };
+
+    var ep_nearby_helper = (function()
+    {
+        const content = $.GetContextPanel().FindChildTraverse("JsFriendsList-lobbies").FindChildTraverse("JsFriendsListSettings").GetChild(0);
+        const panels = [
+            {
+                "id": "nearby_helper_invite_btn",
+                "panel": `
+                    <Button id="nearby_helper_invite_btn"
+                        class="IconButton"
+                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'nearby_helper_invite_btn', 'Invite All' );"
+                        onmouseout="UiToolkitAPI.HideTextTooltip();">
+                        <Image src="file://{images}/icons/ui/invite.svg" />
+                    </Button>
+                `,
+                "scripts": [
+                    (content) => {
+                        content.FindChildTraverse("nearby_helper_invite_btn").SetPanelEvent('onactivate', ep_nearby_helper.invite)
+                    },
+                    (content) => { 
+                        content.MoveChildBefore(content.FindChildTraverse("nearby_helper_invite_btn"), content.FindChildTraverse("JsFriendsList-lobbies-toolbar-button-refresh"));
+                    }
+                ]
+            }
+        ];
+
+        const _init = function() {
+            if (!content.BHasClass("left-right-flow")) content.AddClass("left-right-flow");
+
+            ep_globals.destroy(content, panels);
+            ep_globals.create(content, panels);
+
+            ep_globals.elements.nearby_helper = () => { ep_globals.destroy(content, panels); };
+        };
+
+        const _invite = function() {
+            const nearby_count = PartyBrowserAPI.GetResultsCount();
+
+            if (nearby_count.length <= 0) return false;
+
+            for (let i = 0; i < nearby_count; i++) {
+                StoreAPI.RecordUIEvent("ActionInviteFriendFrom_nearby");
+                const xuid = PartyBrowserAPI.GetXuidByIndex(i);
+                FriendsListAPI.ActionInviteFriend(xuid, '');
+                $.DispatchEvent('FriendInvitedFromContextMenu', xuid);
+            }
+
+            return true;
+        };
+
+        return {
+            init: _init,
+            invite: _invite
+        };
+    })();
+
+    var ep_match_helper = (function()
+    {
+        let content = null
+        const panels = [
+            {
+                "id": "match_helper_panel",
+                "panel": `
+                    <Panel id="match_helper_panel"
+                        class="horizontal-align-right left-right-flow">
+                        <Button id="match_helper_leave_btn"
+                            class="IconButton horizontal-align-right">
+                            onmouseover="UiToolkitAPI.ShowTextTooltip( 'match_helper_leave_btn', 'Leave Lobby' );"
+                            onmouseout="UiToolkitAPI.HideTextTooltip();">
+                            <Image src="file://{images}/icons/ui/leave.svg" />
+                        </Button>
+
+                        <Button id="match_helper_cancel_btn"
+                            class="IconButton horizontal-align-right">
+                            onmouseover="UiToolkitAPI.ShowTextTooltip( 'match_helper_cancel_btn', 'Cancel Queue' );"
+                            onmouseout="UiToolkitAPI.HideTextTooltip();">
+                            <Image src="file://{images}/icons/ui/cancel.svg" />
+                        </Button>
+                    </Panel>
+                `,
+                "scripts": [
+                    (content) => { 
+                        content.FindChildTraverse("match_helper_leave_btn").SetPanelEvent('onactivate', () => { LobbyAPI.CloseSession(); })
+                    },
+                    (content) => {
+                        content.FindChildTraverse("match_helper_cancel_btn").SetPanelEvent('onactivate', () => { LobbyAPI.StopMatchmaking(); })
+                    }
+                ]
+            }
+        ];
+
+        const _init = function(popup) {
+            content = popup.FindChildrenWithClassTraverse("accept-match__bg")[0];
+            ep_globals.destroy(content, panels);
+            ep_globals.create(content, panels);
+        };
+
+        return {
+            init: _init
+        }
+    })(); 
+    
+    var ep_lobby_commands = (function()
+    {
+        const _utils = {
+            party: function(msg) {
+                let filter_msg = msg.split(' ').join('\u{00A0}');
+                PartyListAPI.SessionCommand('Game::Chat', `run all xuid ${MyPersonaAPI.GetXuid()} chat ${filter_msg}`);
+            },
+
+            success: function(msg) {
+                let prefix = `${ep_globals.symbols.check} ${ep_globals.symbols.bullet} ${msg}`
+                let filter_msg = prefix.split(' ').join('\u{00A0}');
+                PartyListAPI.SessionCommand('Game::Chat', `run all xuid ${MyPersonaAPI.GetXuid()} chat ${filter_msg}`);
+            },
+
+            error: function(msg) {
+                let prefix = `${ep_globals.symbols.times} ${ep_globals.symbols.bullet} ${msg}`
+                let filter_msg = prefix.split(' ').join('\u{00A0}');
+                PartyListAPI.SessionCommand('Game::Chat', `run all xuid ${MyPersonaAPI.GetXuid()} chat ${filter_msg}`);
+            },
+
+            warn: function(msg) {
+                let prefix = `${ep_globals.symbols.warning} ${ep_globals.symbols.bullet} ${msg}`
+                let filter_msg = prefix.split(' ').join('\u{00A0}');
+                PartyListAPI.SessionCommand('Game::Chat', `run all xuid ${MyPersonaAPI.GetXuid()} chat ${filter_msg}`);
+            },
+
+            get_lobby_users: function(steam_id = "") {
+                let settings = LobbyAPI.GetSessionSettings().members;
+                if (!settings) return false;
+
+                let players = Array.from({length: settings.numMachines}, (item, i) => {
+                    return {
+                        name: settings[`machine${i}`].player0.name,
+                        xuid: settings[`machine${i}`].player0.xuid,
+                        location: settings[`machine${i}`].player0.game.loc
+                    }
+                });
+
+                let output = []
+
+                if (ep_globals.regex.steamid64.test(steam_id)) {
+                    const p = players.find((x) => x.xuid === steam_id);
+                    if (p) output.push(p);
+                } else if (ep_globals.regex.lobby_index.test(steam_id)) {
+                    const p = players[Number(steam_id) - 1]
+                    if (p) output.push(p);
+                } else if (ep_globals.regex.friend_code.test(steam_id)) {
+                    players.every((x) => {
+                        if (x.xuid === FriendsListAPI.GetXuidFromFriendCode(steam_id)) output.push(x);
+                        return true;
+                    });
+                } else if (steam_id.length > 0) {
+                    players.every((x) => {
+                        if (x.name.toLowerCase().startsWith(steam_id.toLowerCase())) output.push(x);
+                        return true;
+                    });
+                } else {
+                    output = players;
+                }
+
+                return output;
+            },
+
+            startq: function() {
+                let stage = '';
+
+                //let tournament = $.GetContextPanel().FindChildTraverse('TournamentStageDropdown');
+                //if (tournament.GetSelected() !== null) stage = tournament.GetSelected().GetAttributeString('data', '');
+
+                LobbyAPI.StartMatchmaking(
+                    MyPersonaAPI.GetMyOfficialTournamentName(),
+                    MyPersonaAPI.GetMyOfficialTeamName(),
+                    '',
+                    stage
+                );
+            },
+
+            stopq: function() {
+                LobbyAPI.StopMatchmaking();
+            }
+        };
+
+        let _commands = [
+            {
+                title: 'Help',
+                cmds: ['help', 'h'],
+                enabled: true,
+                exec: (cmd, args, user, steam_id) => {
+                    _commands.forEach((x, i) => {
+                        if (i == 0) return;
+
+                        let msg = '';
+
+                        // enabled?
+                        msg += `${x.enabled ? ep_globals.symbols.check : ep_globals.symbols.times} `;
+                        // command
+                        msg += `${x.title} ${ep_globals.symbols.bullet} (`;
+                        // cmds & alias
+                        let cmds = x.cmds.map((y) => `${ep_globals.config.prefix}${y}`);
+                        msg += `${cmds.join(', ')})`;
+                        
+                        _utils.party(msg);
+                    });
+                }
+            },
+            {
+                title: 'Start Queue',
+                cmds: ['startq', 'start', 'q'],
+                enabled: true,
+                exec: (cmd, args, user, steam_id) => {
+                    if (!LobbyAPI.BIsHost()) return;
+
+                    _utils.startq();
+                }
+            },
+            {
+                title: 'Stop Queue',
+                cmds: ['stopq', 'stop', 'sq'],
+                enabled: true,
+                exec: (cmd, args, user, steam_id) => {
+                    _utils.stopq();
+                }
+            },
+            {
+                title: 'Restart Queue',
+                cmds: ['restartq', 'restart', 'rq'],
+                enabled: true,
+                exec: (cmd, args, user, steam_id) => {
+                    if (!LobbyAPI.BIsHost()) return;
+
+                    _utils.stopq();
+
+                    $.Schedule(1, () => {
+                        _utils.startq();
+                    });
+                }
+            },
+            {
+                title: 'Maps',
+                cmds: ['maps', 'map', 'm'],
+                enabled: true,
+                exec: (cmd, args, user, steam_id) => {
+                    if (!LobbyAPI.BIsHost()) return;
+
+                    let settings = LobbyAPI.GetSessionSettings();
+                    let config = GameTypesAPI.GetConfig();
+                    if (!settings || !config) {
+                        _utils.error('Something went wrong!');
+                        return;
+                    }
+
+                    if (args.length === 0) {
+                        _utils.error('Please provide at least one argument!');
+                        return;
+                    }
+
+                    let new_settings = {
+                        update: {
+                            game: {
+                                mapgroupname: []
+                            }
+                        }
+                    };
+
+                    let map_pool = Object.keys(config.gameTypes[settings.game.type].gameModes[settings.game.mode].mapgroupsMP);
+
+                    let converted_names = {}
+                    for (const map of map_pool) {
+                        converted_names[map] = $.Localize(`#SFUI_Map${map.replace('mg', '')}`);
+                    }
+
+                    for (const map of args) {
+                        const map_regex = new RegExp(map, 'i');
+                        Object.entries(converted_names).find((x) => {
+                            if (map_regex.test(x[1])) {
+                                new_settings.update.game.mapgroupname.push(x[0])
+                                return true;
+                            }
+                            
+                            return false;
+                        });
+                    }
+
+                    if (new_settings.update.game.mapgroupname.length === 0) {
+                        _utils.error(`No maps found!`);
+                    } else {
+                        const friendly_maps = new_settings.update.game.mapgroupname.map((x) => converted_names[x])
+
+                        _utils.success(`Changed Maps to:`);
+
+                        let chunk = 0
+                        for (var i = 0; i < Math.ceil(friendly_maps.length / 4); i++) {
+                            _utils.party(friendly_maps.slice(chunk, chunk + 4).join(', '));
+                            chunk += 4;
+                        }
+
+                        new_settings.update.game.mapgroupname = new_settings.update.game.mapgroupname.join(',');
+                        LobbyAPI.UpdateSessionSettings(new_settings);
+                    }
+                }
+            },
+            {
+                title: 'Gamemode',
+                cmds: ['gamemode', 'mode', 'gm'],
+                enabled: true,
+                exec: (cmd, args, user, steam_id) => {
+                    if (!LobbyAPI.BIsHost()) return;
+
+                    let settings = LobbyAPI.GetSessionSettings();
+                    if (!settings) {
+                        _utils.error('Something went wrong!');
+                        return;
+                    }
+
+                    let new_settings = {
+                        update: {
+                            game: {}
+                        }
+                    };
+
+                    if (ep_globals.regex.competitive.test(args[0])) {
+                        new_settings.update.game.mode = 'competitive';
+                    } else if (ep_globals.regex.wingman.test(args[0])) {
+                        new_settings.update.game.mode = 'scrimcomp2v2';
+                    } else {
+                        if (settings.game.mode == 'competitive') {
+                            new_settings.update.game.mode = 'scrimcomp2v2';
+                        } else {
+                            new_settings.update.game.mode = 'competitive';
+                        }
+                    }
+                    new_settings.update.game.type = 'classic';
+
+                    LobbyAPI.UpdateSessionSettings(new_settings);
+
+                    _utils.success(`Changed Gamemode to ${new_settings.update.game.mode}!`);
+                }
+            },
+            {
+                title: 'Location',
+                cmds: ['locate', 'loc'],
+                enabled: true,
+                exec: (cmd, args, user, steam_id) => {
+                    const users = args.length !== 0 ? _utils.get_lobby_users(args[0]) : _utils.get_lobby_users()
+
+                    if (users.length <= 0) {
+                        _utils.error('Nothing found!');
+                        return;
+                    }
+
+                    users.forEach((x) => {
+                        _utils.party(`${ep_globals.symbols.location} ${ep_globals.symbols.bullet} ${x.name} đến từ ${ep_globals.locations[x.location]}`);
+                    });
+                }
+            },
+            {
+                title: '8Ball',
+                cmds: ['8ball', '8b'],
+                enabled: true,
+                exec: (cmd, args, user, steam_id) => {
+                    if (args.length === 0) {
+                        _utils.error('Please provide at least one argument!');
+                        return;
+                    }
+
+                    _utils.party(`${ep_globals.symbols.ball8} ${ep_globals.symbols.bullet} ${Math.round(Math.random()) ? 'Yes' : 'No'}`);
+                }
+            },
+            {
+                title: 'Dice',
+                cmds: ['dice', 'd'],
+                enabled: true,
+                exec: (cmd, args, user, steam_id) => {
+                    const number = Math.round(Math.random() * (6 - 1)) + 1
+                    _utils.party(`${ep_globals.symbols.dice[number - 1]} ${ep_globals.symbols.bullet} ${number}`);
+                }
+            }
+        ];
+
+        const _toggle_command = function(type, value) {
+            _commands.every((c, i) => {
+                if (c.title == type) {
+                    _commands[i].enabled = value;
+                    return false;
+                }
+
+                return true;
+            });
+        }
+
+        const _on_new_chat_entry = function(panel, type) {
+            switch (type) {
+                case 'PlayerChat':
+                    $.Schedule(0.2, function(panel)
+                    {
+                        let chat_lines = panel.GetParent().Children();
+                        let line = chat_lines[0].GetChild(0);
+                        if (!line || !line.BHasClass('left-right-flow') || !line.BHasClass('horizontal-align-left')) return;
+
+                        let label = line.GetChild(line.GetChildCount() - 1);
+                        if (!label || !label.text) return;
+
+                        let user = $.Localize('{s:player_name}', label);
+                        let msg = $.Localize('{s:msg}', label);
+                        if (!user || !msg) return;
+
+                        if (!msg.startsWith(ep_globals.config.prefix)) return;
+
+                        let steam_id = line.GetChildCount() == 2 ? line.Children()[0].steamid : null;
+
+                        const args = msg.slice(ep_globals.config.prefix.length).trim().split(' ');
+                        const command = args.shift().toLowerCase();
+                        _commands.every((c) => {
+                            let f = false;
+
+                            if (!c.enabled) return true;
+
+                            c.cmds.every((a) => {
+                                if (a === command) {
+                                    c.exec(command, args, user, steam_id);
+                                    return false;
+                                }
+                                return true;
+                            });
+                            return f ? false : true;
+                        });
+
+                    }.bind(this, panel));
+                    break;
+            }
+        };
+
+        return {
+            toggle_command: _toggle_command,
+            on_new_chat_entry: _on_new_chat_entry
+        };
+    })();
+
+    var ep_invite_helper = (function()
+    {
+        const content = $.GetContextPanel().FindChildTraverse("JsFriendsList-requests").FindChildTraverse("JsFriendsListSettings").GetChild(0);
+        const panels = [
+            {
+                "id": "invite_helper_copy_btn",
+                "panel": `
+                    <Button id="invite_helper_copy_btn"
+                        class="IconButton"
+                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'invite_helper_copy_btn', 'Copy Friendcode' );"
+                        onmouseout="UiToolkitAPI.HideTextTooltip();">
+                        <Image src="file://{images}/icons/ui/link.svg" />
+                    </Button>
+                `,
+                "scripts": [
+                    () => { content.FindChildTraverse("invite_helper_copy_btn").SetPanelEvent('onactivate', ep_invite_helper.copy_code) }
+                ]
+            },
+            {
+                "id": "start_q_button",
+                "panel": `
+                    <Button id="start_q_button"
+                        class="IconButton"
+                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'start_q_button', 'Start Seaching' );"
+                        onmouseout="UiToolkitAPI.HideTextTooltip();">
+                        <Image src="file://{images}/icons/ui/play.svg" />
+                    </Button>
+                `,
+                "scripts": [
+                    () => { content.FindChildTraverse("start_q_button").SetPanelEvent('onactivate', ep_invite_helper.startqb) }
+                ]
+            },
+            {
+                "id": "stop_q_button",
+                "panel": `
+                    <Button id="stop_q_button"
+                        class="IconButton"
+                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'stop_q_button', 'Stop Seaching' );"
+                        onmouseout="UiToolkitAPI.HideTextTooltip();">
+                        <Image src="file://{images}/icons/ui/exit.svg" />
+                    </Button>
+                `,
+                "scripts": [
+                    () => { content.FindChildTraverse("stop_q_button").SetPanelEvent('onactivate', ep_invite_helper.stopqb) }
+                ]
+            },
+            {
+                "id": "restart_q_button",
+                "panel": `
+                    <Button id="restart_q_button"
+                        class="IconButton"
+                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'restart_q_button', 'Restart Seaching' );"
+                        onmouseout="UiToolkitAPI.HideTextTooltip();">
+                        <Image src="file://{images}/icons/ui/refresh.svg" />
+                    </Button>
+                `,
+                "scripts": [
+                    () => { content.FindChildTraverse("restart_q_button").SetPanelEvent('onactivate', ep_invite_helper.restartqb) }
+                ]
+            },
+            {
+                "id": "invite_helper_location_btn",
+                "panel": `
+                    <Button id="invite_helper_location_btn"
+                        class="IconButton"
+                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'invite_helper_location_btn', 'Check Location' );"
+                        onmouseout="UiToolkitAPI.HideTextTooltip();">
+                        <Image src="file://{images}/icons/ui/inposition.svg" />
+                    </Button>
+                `,
+                "scripts": [
+                    (content) => {
+                        content.FindChildTraverse("invite_helper_location_btn").SetPanelEvent('onactivate', ep_invite_helper.location)
+                    }
+                ]
+            }
+        ];
+
+        const _init = function() {
+            if (!content.BHasClass("left-right-flow")) content.AddClass("left-right-flow");
+
+            ep_globals.destroy(content, panels);
+            ep_globals.create(content, panels);
+
+            ep_globals.elements.invite_helper = () => { ep_globals.destroy(content, panels); };
+        };
+
+        const _copy_code = function() {
+            SteamOverlayAPI.CopyTextToClipboard(MyPersonaAPI.GetFriendCode());
+        };
+
+        const _startqb = function() {
+            LobbyAPI.StartMatchmaking('', '', '', '');
+        };
+
+        const _stopqb = function() {
+            LobbyAPI.StopMatchmaking();
+        };
+
+        const _restartqb = function() {
+            if (!LobbyAPI.BIsHost()) return;
+
+            LobbyAPI.StopMatchmaking();
+
+            $.Schedule(1, () => {
+                LobbyAPI.StartMatchmaking('', '', '', '');
+            });
+        };
+
+        const _invite = function(code) {
+            if (code === null) return false;
+
+            StoreAPI.RecordUIEvent("ActionInviteFriendFrom_nearby");
+            const xuid = FriendsListAPI.GetXuidFromFriendCode(code.toUpperCase());
+            FriendsListAPI.ActionInviteFriend(xuid, '');
+            $.DispatchEvent('FriendInvitedFromContextMenu', xuid);
+
+            return true;
+        };
+
+        const _create_lobby = function() {
+            LobbyAPI.CreateSession();
+            PartyListAPI.SessionCommand("MakeOnline", "");
+
+            return true;
+        };
+
+        const _location = function() {
+            let settings = LobbyAPI.GetSessionSettings().members;
+            if (!settings) {
+                return false;
+            }
+
+            let players = Array.from({length: settings.numMachines}, (item, i) => {
+                return {
+                    name: settings[`machine${i}`].player0.name,
+                    location: settings[`machine${i}`].player0.game.loc
+                }
+            });
+
+            players.forEach((x) => {
+                let title = `${ep_globals.symbols.location} ${ep_globals.symbols.bullet} ${x.name} đến từ ${ep_globals.locations[x.location]}`;
+                let message = title.split(' ').join('\u{00A0}');
+                let xuid = MyPersonaAPI.GetXuid();
+                if (!xuid) return false;
+                PartyListAPI.SessionCommand('Game::Chat', `run all xuid ${xuid} chat ${message}`);
+            });
+
+            return true
+        };
+
+        return {
+            init: _init,
+            copy_code: _copy_code,
+            startqb: _startqb,
+            stopqb: _stopqb,
+            restartqb: _restartqb,
+            invite: _invite,
+            create_lobby: _create_lobby,
+            location: _location,
+        };
+    })();    
+
+    var ep_ad_helper = (function()
+    {
+        const content = $.GetContextPanel().FindChildrenWithClassTraverse('chat-panel-outer')[0];
+        const panels = [
+            {
+                "id": "ad_helper_main_pn",
+                "panel": `
+                    <Panel id="ad_helper_main_pn">
+                        <Panel id="ad_helper_main_pn_blur" style="opacity: 0;" />
+                        <Panel id="ad_helper_main_pn_inner" style="opacity: 0;">
+                            <Panel id="ad_helper_main_pn_header">
+                                <Image src="file://{images}/icons/ui/buyzone.svg" texturewidth="24" textureheight="-1" />
+                                <Label text="Get premium version here!" />
+                                <Image src="file://{images}/icons/ui/link.svg" texturewidth="16" textureheight="-1" />
+                                <Image src="file://{images}/icons/ui/exit.svg" texturewidth="16" textureheight="-1" />
+                            </Panel>
+                        </Panel>
+                    </Panel>
+                `,
+                "scripts": [
+                    (content) => {
+                        const main = 'ad_helper_main_pn';
+
+                        let panel = {};
+                        panel._ = content.FindChildTraverse(main);
+                        panel.blur = panel._.FindChildTraverse(`${main}_blur`);
+                        panel.inner = panel._.FindChildTraverse(`${main}_inner`);
+
+                        ep_globals.apply_styles(panel._, {
+                            width: '100%',
+                            height: '60px',
+                            paddingBottom: '26px',
+                        });
+
+                        $.GetContextPanel().FindChildTraverse('MainMenuCore').AddBlurPanel(panel.blur);
+
+                        ep_globals.apply_styles(panel.blur, {
+                            width: '100%',
+                            height: '100%',
+                            opacity: '0.1',
+                            backgroundColor: 'rgba(128, 0, 255, 0.55)',
+                            transitionProperty: 'background-color',
+                            transitionDuration: '0.2s',
+                            transitionTimingFunction: 'ease-in-out'
+                        });
+
+                        panel._.SetPanelEvent('onactivate', ep_globals.open_ad);
+
+                        ep_globals.apply_styles(panel.inner, {
+                            width: '100%',
+                            height: '100%',
+                            padding: '5px 10px',
+                            transitionProperty: 'opacity',
+                            transitionDuration: '1s',
+                            transitionTimingFunction: 'ease-in-out'
+                        });
+                        
+                        let header = {};
+                        header._ = panel._.FindChildTraverse(`${main}_header`);
+                        ep_globals.apply_styles(header._, {
+                            width: '100%',
+                            flowChildren: 'right',
+                        });
+
+                        header.icon = header._.GetChild(0);
+                        ep_globals.apply_styles(header.icon, {
+                            paddingRight: "10px",
+                            verticalAlign: 'center'
+                        });
+
+                        header.label = header._.GetChild(1);
+                        ep_globals.apply_styles(header.label, {
+                            fontSize: '18px'
+                        });
+                        
+                        header.link = header._.GetChild(2);
+                        ep_globals.apply_styles(header.link, {
+                            verticalAlign: 'center',
+                            opacity: 0,
+                            transitionProperty: 'opacity',
+                            transitionDuration: '0.2s',
+                            transitionTimingFunction: 'ease-in-out'
+                        });
+
+                        panel._.SetPanelEvent('onmouseover', () => {
+                            ep_globals.apply_styles(panel.blur, {
+                                backgroundColor: 'rgba(128, 0, 255, 1)'
+                            });
+
+                            ep_globals.apply_styles(header.link, {
+                                opacity: 1
+                            });
+
+                            ep_globals.apply_styles(header.close, {
+                                opacity: 0.55
+                            });
+                        });
+                        
+                        panel._.SetPanelEvent('onmouseout', () => {
+                            ep_globals.apply_styles(panel.blur, {
+                                backgroundColor: 'rgba(128, 0, 255, 0.55)'
+                            });
+
+                            ep_globals.apply_styles(header.link, {
+                                opacity: 0
+                            });
+
+                            ep_globals.apply_styles(header.close, {
+                                opacity: 0
+                            });
+                        });
+
+                        header.close = header._.GetChild(3);
+                        ep_globals.apply_styles(header.close, {
+                            verticalAlign: 'center',
+                            horizontalAlign: 'right',
+                            opacity: 0,
+                            transitionProperty: 'opacity',
+                            transitionDuration: '0.2s',
+                            transitionTimingFunction: 'ease-in-out'
+                        });
+
+                        header.close.SetPanelEvent('onactivate', () => {
+                            ep_globals.destroy(content, [{ id: main }]);
+                            content.GetChild(0).style.paddingTop = "0px";
+                        });
+
+                        header.close.SetPanelEvent('onmouseover', () => {
+                            ep_globals.apply_styles(header.close, {
+                                opacity: 1
+                            });
+                        });
+
+                        header.close.SetPanelEvent('onmouseout', () => {
+                            ep_globals.apply_styles(header.close, {
+                                opacity: 0.55
+                            });
+                        });
+
+
+                        content.GetChild(0).style.paddingTop = "34px";
+                        ep_globals.apply_styles(panel.blur, {
+                            opacity: 1
+                        });
+
+                        ep_globals.apply_styles(panel.inner, {
+                            opacity: 1
+                        });
+                    }
+                ]
+            }
+        ];
+
+        const _init = function() {
+            ep_globals.destroy(content, panels);
+            ep_globals.create(content, panels);
+
+            ep_globals.elements.ad_helper = () => { 
+                ep_globals.destroy(content, panels);
+
+                if (!ep_globals.config.premium)
+                    $.GetContextPanel().FindChildrenWithClassTraverse('chat-panel-outer')[0].GetChild(0).style.paddingTop = "0px";
+            };
+        };
+
+        return {
+            init: _init,
+        };
+
+    })();
+
+    ep_nearby_helper.init();
+    ep_invite_helper.init();
+
+    if (ep_globals.config.premium) 
+        ep_globals.register_events("OnNewChatEntry", $.RegisterForUnhandledEvent("OnNewChatEntry", ep_lobby_commands.on_new_chat_entry));
+        ep_globals.register_events("ShowAcceptPopup", $.RegisterForUnhandledEvent("ShowAcceptPopup", ep_match_helper.init));
+        
+    if (!ep_globals.config.premium) 
+        ep_ad_helper.init();
+]]);
+
+callbacks.Register("Unload", function()
+    panorama.RunScript("ep_globals.unregister_events()")
+end)
+
+--------RankWin--------
+local w,h = draw.GetScreenSize()
+
+local IN_SCOREBOARD = false
+
+local ranks = {
+"Silver 1",
+"Silver 2",
+"Silver 3",
+"Silver 4",
+"Silver Elite",
+"Silver Elite Master",
+
+"GOLD NOVA 1",
+"GOLD NOVA 2",
+"GOLD NOVA 3",
+"GOLD NOVA Master",
+
+"MASTER GUARDIAN 1",
+"MASTER GUARDIAN 2",
+"MASTER GUARDIAN ELITE",
+"DISTINGUISHED MASTER GUARDIAN",
+
+"LEGENDARY EAGLE",
+"LEGENDARY EAGLE MASTER",
+"SUPREME MASTER FIRST CLASS",
+"GLOBAL ELITE"
+}
+
+local font = draw.CreateFont("Tahoma", 16, 460)
+
+callbacks.Register("CreateMove", function(cmd)
+local IN_SCORE = bit.lshift(1, 16)
+IN_SCOREBOARD = bit.band(cmd.buttons, IN_SCORE) == IN_SCORE
+end)
+
+callbacks.Register("Draw", function()
+if not engine.GetServerIP() then return end
+
+if not engine.GetServerIP():gmatch("=[A:") then return end
+
+if not gui.Reference("menu"):IsActive() and not IN_SCOREBOARD then return end
+
+local y = h/2
+
+for i, v in next, entities.FindByClass("CCSPlayer") do
+if v:GetName() ~= "GOTV" and entities.GetPlayerResources():GetPropInt("m_iPing", v:GetIndex()) ~= 0 then
+local index = v:GetIndex()
+local rank_index = entities.GetPlayerResources():GetPropInt("m_iCompetitiveRanking", index)
+local wins = entities.GetPlayerResources():GetPropInt("m_iCompetitiveWins", index)
+local rank = ranks[rank_index] or "Unranked"
+draw.SetFont(font)
+draw.Color(210,210,210,255)
+draw.Text(5, y, v:GetName().." - Rank: "..rank.." Wins: "..wins)
+y = y + 30
+end
+end
+end)
+
+--------VoteRevealer--------
+-- Vote revealer by Cheeseot
+
+local activeVotes = {};
+local font = draw.CreateFont('Arial', 14, 14);
+local votecolor = {};
+local animend = 0;
+local votername = ""
+local votetype = 0
+local votetarget = ""
+local enemyvote = 0
+local yescount = 0
+local nocount = 0
+local voteresult = 0
+local displayed = 0
+local scrnw, scrnh = 0
+
+local timer = timer or {}
+local timers = {}
+
+local function screensize()
+    scrnw, scrnh = draw.GetScreenSize()
+end
+
+callbacks.Register("Draw", screensize)
+
+local function timerCreate(name, delay, times, func)
+
+    table.insert(timers, {["name"] = name, ["delay"] = delay, ["times"] = times, ["func"] = func, ["lastTime"] = globals.RealTime()})
+
+end
+
+local function timerRemove(name)
+
+    for k,v in pairs(timers or {}) do
+    
+        if (name == v["name"]) then table.remove(timers, k) end
+    
+    end
+
+end
+
+local function timerTick()
+
+    for k,v in pairs(timers or {}) do
+    
+        if (v["times"] <= 0) then table.remove(timers, k) end
+        
+        if (v["lastTime"] + v["delay"] <= globals.RealTime()) then 
+            timers[k]["lastTime"] = globals.RealTime()
+            timers[k]["times"] = timers[k]["times"] - 1
+            v["func"]() 
+        end
+    
+    end
+
+end
+
+callbacks.Register( "Draw", "timerTick", timerTick);
+
+local function startTimer()
+timerCreate("sleep", 4, 1, function() animend = 1; enemyvote = 0; voteresult = 0; displayed = 0 end)
+end
+
+local function getVoteEnd(um)
+if um:GetID() == 47 or um:GetID() == 48 then
+	startTimer()
+	yescount = 0
+	nocount = 0
+	enemyvote = 2
+	
+	if um:GetID() == 47 then
+		voteresult = 1
+	end
+	if um:GetID() == 48 then
+		voteresult = 2
+	end
+end
+
+if um:GetID() == 46 then
+local localPlayer = entities.GetLocalPlayer();
+local team = um:GetInt(1)
+local idx = um:GetInt(2)
+votetype = um:GetInt(3)
+votetarget = um:GetString(5)
+if (string.len(votetarget) > 20) then
+	votetarget = string.sub(votetarget, 0, 15) .. "..."
+end
+votername = client.GetPlayerNameByIndex(idx)
+if (string.len(votername) > 20) then
+	votername = string.sub(votername, 0, 15) .. "..."
+end
+if localPlayer:GetTeamNumber() ~= team and votetype ~= 1 then
+enemyvote = 1
+displayed = 1
+end
+end
+end;
+
+callbacks.Register("DispatchUserMessage", getVoteEnd)
+
+-- Vote revealer by Cheeseot
+
+
+local function add(time, ...)
+    table.insert(activeVotes, {
+        ["text"] = { ... },
+        ["time"] = time,
+        ["delay"] = globals.RealTime() + time,
+        ["color"] = {votecolor, {10, 10, 10}},
+        ["x_pad"] = -11,
+        ["x_pad_b"] = -11,
+    })
+end
+
+local function getMultiColorTextSize(lines)
+    local fw = 0
+    local fh = 0;
+    for i = 1, #lines do
+        draw.SetFont(font);
+        local w, h = draw.GetTextSize(lines[i][4])
+        fw = fw + w
+        fh = h;
+    end
+    return fw, fh
+end
+
+local function drawMultiColorText(x, y, lines)
+    local x_pad = 0
+    for i = 1, #lines do
+        local line = lines[i];
+        local r, g, b, msg = line[1], line[2], line[3], line[4]
+        draw.SetFont(font);
+        draw.Color(r, g, b, 255);
+        draw.Text(x + x_pad, y, msg);
+        local w, _ = draw.GetTextSize(msg)
+        x_pad = x_pad + w
+    end
+end
+
+local function showVotes(count, color, text, layer)
+    local y = scrnh / 2 - 15 + scrnh/10 - 8  + 9 + (36 * (count - 1));
+    local w, h = getMultiColorTextSize(text)
+    local mw = w < 50 and 50 or w
+    if globals.RealTime() < layer.delay then
+        if layer.x_pad < mw then layer.x_pad = layer.x_pad + (mw - layer.x_pad) * 0.05 end
+        if layer.x_pad > mw then layer.x_pad = mw end
+        if layer.x_pad > mw / 1.09 then
+            if layer.x_pad_b < mw - 6 then
+                layer.x_pad_b = layer.x_pad_b + ((mw - 6) - layer.x_pad_b) * 0.05
+            end
+        end
+        if layer.x_pad_b > mw - 6 then
+            layer.x_pad_b = mw - 6
+        end
+    elseif animend == 1 then
+        if layer.x_pad_b > -11 then
+            layer.x_pad_b = layer.x_pad_b - (((mw - 5) - layer.x_pad_b) * 0.05) + 0.01
+        end
+        if layer.x_pad_b < (mw - 11) and layer.x_pad >= 0 then
+            layer.x_pad = layer.x_pad - (((mw + 1) - layer.x_pad) * 0.05) + 0.01
+        end
+        if layer.x_pad < 0 then
+            table.remove(activeVotes, count)
+        end
+    end
+    local c1 = color[1]
+    local c2 = color[2]
+    local a = 255;
+    draw.Color(c1[1], c1[2], c1[3], a);
+    draw.FilledRect(layer.x_pad - layer.x_pad, y, layer.x_pad + 28, (h + y) + 20);
+    draw.Color(c2[1], c2[2], c2[3], a);
+    draw.FilledRect(layer.x_pad_b - layer.x_pad, y, layer.x_pad_b + 22, (h + y) + 20);
+    drawMultiColorText(layer.x_pad_b - mw + 18, y + 9, text)
+end
+
+-- Vote revealer by Cheeseot
+
+
+local function voteCast(e)
+    if (e:GetName() == "vote_cast") then
+		timerRemove("sleep")
+		animend = 0;
+		local index = e:GetInt("entityid");
+		local vote = e:GetInt("vote_option");
+        local name = client.GetPlayerNameByIndex(index)
+        if (string.len(name) > 20) then
+            name = string.sub(name, 0, 15) .. "..."
+        end
+		
+		local votearray = {};
+		local namearray = {};
+			if vote == 0 then
+				votearray = { 150, 185, 1, "YES" }
+				namearray = { 150, 185, 1, name }
+				votecolor = { 150, 185, 1}
+				yescount = yescount + 1
+			elseif vote == 1 then
+				votearray = { 185, 20, 1, "NO" }
+				namearray = { 185, 20, 1, name }
+				votecolor = { 185, 20, 1}
+				nocount = nocount + 1
+			else
+				votearray = { 150, 150, 150, "??" }
+				namearray = { 150, 150, 150, name }
+				votecolor = { 150, 150, 150}
+			end
+			
+            add(3,
+                namearray,
+                { 255, 255, 255, " voted: " },
+                votearray,
+				{ 255, 255, 255, "   " });
+        end
+    end;
+
+callbacks.Register('FireGameEvent', voteCast)
+
+local function makeVote()
+    for index, votes in pairs(activeVotes) do
+        showVotes(index, votes.color, votes.text, votes)
+    end
+end;
+
+callbacks.Register('Draw', makeVote)
+
+client.AllowListener("vote_cast")
+
+
+local function drawVote()
+local font2 = draw.CreateFont('Arial', 20, 20);
+draw.SetFont(font2)
+local votetypename = ""
+	if enemyvote == 1 then
+		if votetype == 0 then
+			votetypename = "kick player: "
+		elseif votetype == 6 then
+			votetypename = "Surrender"
+		elseif votetype == 13 then
+			votetypename = "Call a timeout"
+		else return
+		end
+            draw.Color(255,150,0,255)
+            draw.FilledRect(0, scrnh/2 - 15, draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) + 30, scrnh/2 - 15 + scrnh/10 - 8)
+            draw.Color(10,10,10,255)
+            draw.FilledRect(0, scrnh/2 - 15, draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) + 20, scrnh/2 - 15 + scrnh/10 - 8)
+            draw.Color(150,185,1,255)
+            draw.Text(5 + (draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) / 2) - 25 - (draw.GetTextSize("  Yes")), scrnh/2 + scrnh/20, yescount .. " Yes") 
+            draw.Color(185,20,1,255)
+            draw.Text(5 + (draw.GetTextSize(votername .. " wants to " .. votetypename .. votetarget) / 2) + 25 , scrnh/2 + scrnh/20, nocount .. " No") 
+            draw.Color(255,150,0,255)
+            draw.Text(5, scrnh/2 + scrnh/100, votername) 
+            draw.Color(255,255,255,255)
+            draw.Text(draw.GetTextSize(votername .. " ") + 5, scrnh/2 + scrnh/100, "wants to ")
+            if votetype == 0 then draw.Color(255,255,255,255) else draw.Color(255,150,0,255) end
+            draw.Text(draw.GetTextSize(votername .. " wants to ") + 5, scrnh/2 + scrnh/100, votetypename)
+            draw.Color(255,150,0,255)
+            draw.Text(draw.GetTextSize(votername .. " wants to " .. votetypename) + 5, scrnh/2 + scrnh/100, votetarget)
+    elseif enemyvote == 2 and displayed == 1 then
+        if voteresult == 1 then
+            draw.Color(150,185,1,255)
+            draw.FilledRect(0, scrnh/2 - 15, draw.GetTextSize("Vote Passed") + 110, scrnh/2 - 15 + scrnh/10 - 8)
+            draw.Color(10,10,10,255)
+            draw.FilledRect(0, scrnh/2 - 15, draw.GetTextSize("Vote Passed") + 100, scrnh/2 - 15 + scrnh/10 - 8)
+            draw.Color(150,185,1,255)
+            draw.Text(50, scrnh/2 + scrnh/36, "Vote Passed") 
+        elseif voteresult == 2 then
+            draw.Color(185,20,1,255)
+            draw.FilledRect(0, scrnh/2 - 15, draw.GetTextSize("Vote Failed") + 110, scrnh/2 - 15 + scrnh/10 - 8)
+            draw.Color(10,10,10,255)
+            draw.FilledRect(0, scrnh/2 - 15, draw.GetTextSize("Vote Failed") + 100, scrnh/2 - 15 + scrnh/10 - 8)
+            draw.Color(185,20,1,255)
+            draw.Text(50, scrnh/2 + scrnh/36, "Vote Failed")  
+		end
+	end
+
+
+end
+
+callbacks.Register("Draw", drawVote)
+
+local function reset()
+if entities.GetLocalPlayer() == nil then
+	enemyvote = 0;
+	activeVotes = {};
+	displayed = 0;
+end
+end
+callbacks.Register("Draw", reset)
+
+--------Watermark--------
+--render
+rect = function( x, y, w, h, col )
+    draw.Color( col[1], col[2], col[3], col[4] );
+    draw.FilledRect(x, y, x + w, y + h)
+end
+
+gradient = function( x, y, w, h, col1, col2, is_vertical )
+    rect( x, y, w, h, col1 );
+
+    local r, g, b = col2[1], col2[2], col2[3];
+
+    if is_vertical then
+        for i = 1, h do
+            local a = i / h * 255;
+            rect( x, y + i, w, 1, { r, g, b, a } );
+        end
+    else
+        for i = 1, w do
+            local a = i / w * 255;
+            rect( x + i, y, 1, h, { r, g, b, a } );
+        end
+    end
+end
+
+local handler_variables = 
+{
+    weapon_group =  {pistol = {2, 3, 4, 30, 32, 36, 61, 63}, 
+                     sniper = {9}, 
+                     scout = {40}, 
+                     hpistol = {1, 64}, 
+                     smg = {17, 19, 23, 24, 26, 33, 34}, 
+                     rifle = {60, 7, 8, 10, 13, 16, 39}, 
+                     shotgun = {25, 27, 29, 35}, 
+                     asniper = {38, 11}, 
+                     lmg = {28, 14},
+                     zeus = {31}
+                    }, 
+    fps = 0,
+    ping = 0,
+    server_ip = 0,
+    tickrate_updated = false,
+    tickrate = client.GetConVar("sv_maxcmdrate"),
+    server = "",
+    user_name = cheat.GetUserName(),
+    local_entity,
+}
+
+--script variable 
+local color_r, color_g, color_b, color_a;
+local mouseX, mouseY, x, y, dx, dy, w, h = 0, 0, 128, 290, 0, 0, 60, 60;
+local shouldDrag = false;
+local font = draw.CreateFont("Verdana", 12, 12);
+local topbarSize = 23;
+local imgRGBA, imgWidth, imgHeight = common.DecodePNG( svgData );
+local texture = draw.CreateTexture( imgRGBA, imgWidth, imgHeight );
+
+local function handlers()
+    --visuals
+    color_r, color_g, color_b, color_a = ui_color:GetValue()
+    handler_variables.fps = 1 / globals.AbsoluteFrameTime()
+
+    --entities
+    handler_variables.local_entity = entities.GetLocalPlayer()
+
+    --local info
+    if handler_variables.local_entity then
+        handler_variables.is_scoped = handler_variables.local_entity:GetPropBool("m_bIsScoped")
+
+        handler_variables.ping = entities:GetPlayerResources():GetPropInt("m_iPing", client.GetLocalPlayerIndex())
+        
+        handler_variables.server_ip = engine.GetServerIP()
+
+        if handler_variables.server_ip == "loopback" then
+            handler_variables.server = "localhost"
+        elseif string.find(handler_variables.server_ip, "A") then
+            handler_variables.server = "valve"    
+        else
+            handler_variables.server = handler_variables.server_ip
+        end
+
+        if not handler_variables.tickrate_updated then
+            handler_variables.tickrate = client.GetConVar("sv_maxcmdrate")
+            handler_variables.tickrate_updated = true
+        end
+    else
+        handler_variables.tickrate_updated = false
+    end
+end
+
+local function getWeaponGroup()
+    if not handler_variables.local_entity or not not handler_variables.local_entity:IsAlive() then
+        return "shared"
+    end
+
+    --get current weapon group
+    local current_weapon_group = "shared"
+
+    for group_name, group_weapons in pairs(weapon_group) do
+        for weapon_id = 1, #group_weapons, 1 do
+
+            local local_weapon_id = handler_variables.local_entity:GetWeaponID()
+
+            if local_weapon_id == group_weapons[weapon_id] then
+                current_weapon_group = group_name
+
+                break
+            end
+        end
+    end
+
+    return current_weapon_group
+end
+
+local function drawRectFill(r, g, b, a, x, y, w, h, texture)
+    if (texture ~= nil) then
+        draw.SetTexture(texture);
+    else
+        draw.SetTexture(texture);
+    end
+    draw.Color(r, g, b, a);
+    draw.FilledRect(x, y, x + w, y + h);
+end
+
+local function dragFeature()
+    if input.IsButtonDown(1) then
+        mouseX, mouseY = input.GetMousePos();
+
+        if shouldDrag then
+            x = mouseX - dx;
+            y = mouseY - dy;
+        end
+
+        if mouseX >= x and mouseX <= x + w and mouseY >= y and mouseY <= y + h then
+            shouldDrag = true;
+            dx = mouseX - x;
+            dy = mouseY - y;
+        end
+    else
+        shouldDrag = false;
+    end
+end
+
+local function drawOutline(r, g, b, a, x, y, w, h, howMany)
+    for i = 1, howMany do
+        draw.Color(r, g, b, a);
+        draw.OutlinedRect(x - i, y - i, x + w + i, y + h + i);
+    end
+end
+
+local function drawWatermark()
+    if not watermark:GetValue()  then
+        return
+    end
+ 
+    local divider = ' | ';
+    local cheatName = 'gamesense';
+ 
+ 
+    local watermarkText = cheatName .. divider .. handler_variables.user_name .. divider .. "ping: " ..  handler_variables.ping .. "ms" .. divider .. 
+                          "fps: " .. string.format("%0.1f", handler_variables.fps)
+
+    draw.SetFont(font);
+    local w, h = draw.GetTextSize(watermarkText);
+    local weightPadding, heightPadding = 20, 13;
+    local watermarkWidth = weightPadding + w;
+    local start_x, start_y = draw.GetScreenSize();
+    start_x, start_y = start_x - watermarkWidth - 0, start_y * 0.0125;
+
+    draw.Color(0, 0, 0, 150);
+    draw.FilledRect(start_x - 10, start_y, start_x + watermarkWidth - 20, start_y -2 + h + heightPadding );
+ 
+    draw.Color(0, 0, 0, 255)
+    draw.Text(start_x + weightPadding /2+4 - 20, start_y + heightPadding / 2 - 1, watermarkText );
+ 
+    draw.Color(255,255,255,255);
+    draw.Text(start_x + weightPadding / 2+4 - 20, start_y + heightPadding / 2 - 1, watermarkText );
+ 
+ 
+    draw.Color(color_r, color_g, color_b, color_a, 255);
+    draw.FilledRect(start_x - 10, start_y, start_x + watermarkWidth - 20, start_y +2);
+end
+
+callbacks.Register("Draw", function()
+    handlers()
+
+    if not handler_variables.local_entity or not handler_variables.local_entity:IsAlive() then return end
+
+    drawWatermark()
+end)
+
+--------Draw Image--------
+local function OnUnload()
+client.Command("toggleconsole", true)
+
+	client.Command('echo "⠄⠄⠄⢰⣧⣼⣯⠄⣸⣠⣶⣶⣦⣾⠄⠄⠄⠄⡀⠄⢀⣿⣿⠄⠄⠄⢸⡇⠄⠄"', true)
+	client.Command('echo "⠄⠄⠄⣾⣿⠿⠿⠶⠿⢿⣿⣿⣿⣿⣦⣤⣄⢀⡅⢠⣾⣛⡉⠄⠄⠄⠸⢀⣿⠄"', true)
+	client.Command('echo "⠄⠄⢀⡋⣡⣴⣶⣶⡀⠄⠄⠙⢿⣿⣿⣿⣿⣿⣴⣿⣿⣿⢃⣤⣄⣀⣥⣿⣿⠄"', true)
+	client.Command('echo "⠄⠄⢸⣇⠻⣿⣿⣿⣧⣀⢀⣠⡌⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⣿⣿⣿⠄"', true)
+	client.Command('echo "⠄⢀⢸⣿⣷⣤⣤⣤⣬⣙⣛⢿⣿⣿⣿⣿⣿⣿⡿⣿⣿⡍⠄⠄⢀⣤⣄⠉⠋⣰"', true)
+	client.Command('echo "⠄⣼⣖⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣿⣿⣿⢇⣿⣿⡷⠶⠶⢿⣿⣿⠇⢀⣤"', true)
+	client.Command('echo "⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣿⡇⣿⣿⣿⣿⣿⣿⣷⣶⣥⣴⣿⡗"', true)
+	client.Command('echo "⢀⠈⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠄"', true)
+	client.Command('echo "⢸⣿⣦⣌⣛⣻⣿⣿⣧⠙⠛⠛⡭⠅⠒⠦⠭⣭⡻⣿⣿⣿⣿⣿⣿⣿⣿⡿⠃⠄"', true)
+	client.Command('echo "⠘⣿⣿⣿⣿⣿⣿⣿⣿⡆⠄⠄⠄⠄⠄⠄⠄⠄⠹⠈⢋⣽⣿⣿⣿⣿⣵⣾⠃⠄"', true)
+	client.Command('echo "⠄⠘⣿⣿⣿⣿⣿⣿⣿⣿⠄⣴⣿⣶⣄⠄⣴⣶⠄⢀⣾⣿⣿⣿⣿⣿⣿⠃⠄⠄"', true)
+	client.Command('echo "⠄⠄⠈⠻⣿⣿⣿⣿⣿⣿⡄⢻⣿⣿⣿⠄⣿⣿⡀⣾⣿⣿⣿⣿⣛⠛⠁⠄⠄⠄"', true)
+	client.Command('echo "⠄⠄⠄⠄⠈⠛⢿⣿⣿⣿⠁⠞⢿⣿⣿⡄⢿⣿⡇⣸⣿⣿⠿⠛⠁⠄⠄⠄⠄⠄"', true)
+	client.Command('echo "⠄⠄⠄⠄⠄⠄⠄⠉⠻⣿⣿⣾⣦⡙⠻⣷⣾⣿⠃⠿⠋⠁⠄⠄⠄⠄⠄⢀⣠⣴"', true)
+	client.Command('echo "⣿⣿⣿⣶⣶⣮⣥⣒⠲⢮⣝⡿⣿⣿⡆⣿⡿⠃⠄⠄⠄⠄⠄⠄⠄⣠⣴⣿⣿⣿"', true)
+
+	if clantagset == 1 then
+		set_clantag("", "")
+	end
+end
+
+--------Miscellaneous--------
+client.Command("+right", true)
+client.Command("+left", true)
+client.Command("snd_menumusic_volume 50", true)
+client.Command("cl_timeout 0 0 0 7", true)
+
+--------Engine Radar--------
+callbacks.Register('CreateMove', function()
+	local isEngineRadarOn = EngineRadar:GetValue() and 1 or 0
+
+	for _, Player in ipairs(entities.FindByClass('CCSPlayer')) do
+		Player:SetProp('m_bSpotted', isEngineRadarOn)
+	end
+end)
+
+--------Force Crosshair--------
+client.AllowListener('item_equip')
+callbacks.Register('FireGameEvent', function(e)
+	if not ForceCrosshair:GetValue() or e:GetName() ~= 'item_equip' then
+		if not client.GetConVar('weapon_debug_spread_show') == '3' then
+			client.SetConVar('weapon_debug_spread_show', 0, true)
+		end
+		return
+	end
+
+	local LocalPlayerIndex = client.GetLocalPlayerIndex()
+	local PlayerIndex = client.GetPlayerIndexByUserID( e:GetInt('userid') )
+	local WeaponType = e:GetInt('weptype')
+
+	if LocalPlayerIndex == PlayerIndex then
+		if WeaponType == 5 then
+			client.SetConVar('weapon_debug_spread_show', 3, true)
+		end
+	end
+end)
+
+--------Recoil Crosshair--------
+local function CrosshairRecoil()
+	if RecoilCrosshair:GetValue() and not gui.GetValue("rbot.master") then
+		client.SetConVar("cl_crosshair_recoil", 1, true)
+	else
+		client.SetConVar("cl_crosshair_recoil", 0, true)
+	end
+end
+
+--------Inventory Unlocker--------
+local function UnlockInventory()
+	panorama.RunScript('LoadoutAPI.IsLoadoutAllowed = () => true');
+end
+
+--------Message Events--------
+local ranks = {"S1","S2","S3","S4","SE","SEM","GN1","GN2","GN3","GNM","MG1","MG2","MGE","DMG","LE","LEM","SMFC","GE",}
+local numbers = {"1","2","3","4","5","6",}
+local responses = {"Yes - definitely.","It is decidedly so.","Without a doubt.","Reply hazy, try again.","Ask again later.","Better not tell you now.","My sources say no.","Outlook not so good.","Very doubtful.",}
+local results = {"won the coinflip!","lost the coinflip!",}
+local gaydar = {"is gay!","is not gay!",}
+local anime = {
+    {
+        "⠄⠄⠄⢰⣧⣼⣯⠄⣸⣠⣶⣶⣦⣾⠄⠄⠄⠄⡀⠄⢀⣿⣿⠄⠄⠄⢸⡇⠄⠄",
+        "⠄⠄⠄⣾⣿⠿⠿⠶⠿⢿⣿⣿⣿⣿⣦⣤⣄⢀⡅⢠⣾⣛⡉⠄⠄⠄⠸⢀⣿⠄",
+        "⠄⠄⢀⡋⣡⣴⣶⣶⡀⠄⠄⠙⢿⣿⣿⣿⣿⣿⣴⣿⣿⣿⢃⣤⣄⣀⣥⣿⣿⠄",
+        "⠄⠄⢸⣇⠻⣿⣿⣿⣧⣀⢀⣠⡌⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⣿⣿⣿⠄",
+        "⠄⢀⢸⣿⣷⣤⣤⣤⣬⣙⣛⢿⣿⣿⣿⣿⣿⣿⡿⣿⣿⡍⠄⠄⢀⣤⣄⠉⠋⣰",
+        "⠄⣼⣖⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣿⣿⣿⢇⣿⣿⡷⠶⠶⢿⣿⣿⠇⢀⣤",
+        "⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣿⡇⣿⣿⣿⣿⣿⣿⣷⣶⣥⣴⣿⡗",
+        "⢀⠈⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠄",
+        "⢸⣿⣦⣌⣛⣻⣿⣿⣧⠙⠛⠛⡭⠅⠒⠦⠭⣭⡻⣿⣿⣿⣿⣿⣿⣿⣿⡿⠃⠄",
+        "⠘⣿⣿⣿⣿⣿⣿⣿⣿⡆⠄⠄⠄⠄⠄⠄⠄⠄⠹⠈⢋⣽⣿⣿⣿⣿⣵⣾⠃⠄",
+        "⠄⠘⣿⣿⣿⣿⣿⣿⣿⣿⠄⣴⣿⣶⣄⠄⣴⣶⠄⢀⣾⣿⣿⣿⣿⣿⣿⠃⠄⠄",
+        "⠄⠄⠈⠻⣿⣿⣿⣿⣿⣿⡄⢻⣿⣿⣿⠄⣿⣿⡀⣾⣿⣿⣿⣿⣛⠛⠁⠄⠄⠄",
+        "⠄⠄⠄⠄⠈⠛⢿⣿⣿⣿⠁⠞⢿⣿⣿⡄⢿⣿⡇⣸⣿⣿⠿⠛⠁⠄⠄⠄⠄⠄",
+        "⠄⠄⠄⠄⠄⠄⠄⠉⠻⣿⣿⣾⣦⡙⠻⣷⣾⣿⠃⠿⠋⠁⠄⠄⠄⠄⠄⢀⣠⣴",
+        "⣿⣿⣿⣶⣶⣮⣥⣒⠲⢮⣝⡿⣿⣿⡆⣿⡿⠃⠄⠄⠄⠄⠄⠄⠄⣠⣴⣿⣿⣿",
+    },
+    {
+        "⡿⠋⠄⣀⣀⣤⣴⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⣌⠻⣿⣿",
+        "⣴⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⠹⣿",
+        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠹",
+        "⣿⣿⡟⢹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡛⢿⣿⣿⣿⣮⠛⣿⣿⣿⣿⣿⣿⡆",
+        "⡟⢻⡇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣣⠄⡀⢬⣭⣻⣷⡌⢿⣿⣿⣿⣿⣿",
+        "⠃⣸⡀⠈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠈⣆⢹⣿⣿⣿⡈⢿⣿⣿⣿⣿",
+        "⠄⢻⡇⠄⢛⣛⣻⣿⣿⣿⣿⣿⣿⣿⣿⡆⠹⣿⣆⠸⣆⠙⠛⠛⠃⠘⣿⣿⣿⣿",
+        "⠄⠸⣡⠄⡈⣿⣿⣿⣿⣿⣿⣿⣿⠿⠟⠁⣠⣉⣤⣴⣿⣿⠿⠿⠿⡇⢸⣿⣿⣿",
+        "⠄⡄⢿⣆⠰⡘⢿⣿⠿⢛⣉⣥⣴⣶⣿⣿⣿⣿⣻⠟⣉⣤⣶⣶⣾⣿⡄⣿⡿⢸",
+        "⠄⢰⠸⣿⠄⢳⣠⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣼⣿⣿⣿⣿⣿⣿⡇⢻⡇⢸",
+        "⢷⡈⢣⣡⣶⠿⠟⠛⠓⣚⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⢸⠇⠘",
+        "⡀⣌⠄⠻⣧⣴⣾⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠛⠛⠛⢿⣿⣿⣿⣿⣿⡟⠘⠄⠄",
+        "⣷⡘⣷⡀⠘⣿⣿⣿⣿⣿⣿⣿⣿⡋⢀⣠⣤⣶⣶⣾⡆⣿⣿⣿⠟⠁⠄⠄⠄⠄",
+        "⣿⣷⡘⣿⡀⢻⣿⣿⣿⣿⣿⣿⣿⣧⠸⣿⣿⣿⣿⣿⣷⡿⠟⠉⠄⠄⠄⠄⡄⢀",
+        "⣿⣿⣷⡈⢷⡀⠙⠛⠻⠿⠿⠿⠿⠿⠷⠾⠿⠟⣛⣋⣥⣶⣄⠄⢀⣄⠹⣦⢹⣿",
+    },
+    {
+        "⠄⠄⠄⢀⣤⣾⣿⡟⠋⠄⠄⠄⣀⡿⠄⠊⠄⠄⠄⠄⠄⠄⢸⠇⠄⢀⠃⠙⣿⣿",
+        "⣤⠒⠛⠛⠛⠛⠛⠛⠉⠉⠉⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠸⠄⢀⠊⠄⠄⠈⢿",
+        "⣿⣠⠤⠴⠶⠒⠶⠶⠤⠤⣤⣀⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⠃⠄⠂⣀⣀⣀⡀⠄",
+        "⡏⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠈⠙⠂⠄⠄⠄⠄⠄⠄⢀⢎⠐⠛⠋⠉⠉⠉⠉⠛",
+        "⡇⠄⠄⠄⣀⡀⠄⠄⠄⢀⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠎⠁⠄⠄⠄⠄⠄⠄⠄⠄",
+        "⡧⠶⣿⣿⣿⣿⣿⣿⠲⠦⣭⡃⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⡀⠄⠄⠄⠄⠄⠄",
+        "⡇⠄⣿⣿⣿⣿⣿⣿⡄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢰⣾⣿⣿⣿⡟⠛⠶⠄",
+        "⡇⠄⣿⣿⣿⣿⣿⣿⡇⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣼⣿⣿⣿⣿⡇⠄⠄⢀",
+        "⡇⠄⢿⣿⣿⣿⣿⣷⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣿⣿⣿⣿⣿⡇⠄⠄⢊",
+        "⢠⠄⠈⠛⠛⠛⠛⠋⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢿⣿⣿⣿⡦⠁⠄⠄⣼",
+        "⢸⠄⠈⠉⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠉⠉⠄⠄⠄⠄⢰⣿",
+        "⢸⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠁⠉⠄⢸⣿",
+        "⠄⣆⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢸⣿",
+        "⠄⢿⣷⣶⣄⡀⠄⠄⠄⠄⠄⠄⠉⠉⠉⠉⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣴⣿⣿",
+        "⠄⢸⣿⣿⣿⣿⣷⣦⣤⣀⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣀⣠⣤⣶⣿⣿⣿⣿⣿",
+    },
+    {
+        "⣿⠟⣽⣿⣿⣿⣿⣿⢣⠟⠋⡜⠄⢸⣿⣿⡟⣬⢁⠠⠁⣤⠄⢰⠄⠇⢻⢸",
+        "⢏⣾⣿⣿⣿⠿⣟⢁⡴⡀⡜⣠⣶⢸⣿⣿⢃⡇⠂⢁⣶⣦⣅⠈⠇⠄⢸⢸",
+        "⣹⣿⣿⣿⡗⣾⡟⡜⣵⠃⣴⣿⣿⢸⣿⣿⢸⠘⢰⣿⣿⣿⣿⡀⢱⠄⠨⢸",
+        "⣿⣿⣿⣿⡇⣿⢁⣾⣿⣾⣿⣿⣿⣿⣸⣿⡎⠐⠒⠚⠛⠛⠿⢧⠄⠄⢠⣼",
+        "⣿⣿⣿⣿⠃⠿⢸⡿⠭⠭⢽⣿⣿⣿⢂⣿⠃⣤⠄⠄⠄⠄⠄⠄⠄⠄⣿⡾",
+        "⣼⠏⣿⡏⠄⠄⢠⣤⣶⣶⣾⣿⣿⣟⣾⣾⣼⣿⠒⠄⠄⠄⡠⣴⡄⢠⣿⣵",
+        "⣳⠄⣿⠄⠄⢣⠸⣹⣿⡟⣻⣿⣿⣿⣿⣿⣿⡿⡻⡖⠦⢤⣔⣯⡅⣼⡿⣹",
+        "⡿⣼⢸⠄⠄⣷⣷⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣕⡜⡌⡝⡸⠙⣼⠟⢱⠏",
+        "⡇⣿⣧⡰⡄⣿⣿⣿⣿⡿⠿⠿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣋⣪⣥⢠⠏⠄",
+        "⣧⢻⣿⣷⣧⢻⣿⣿⣿⡇⠄⢀⣀⣀⡙⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠂⠄⠄",
+        "⢹⣼⣿⣿⣿⣧⡻⣿⣿⣇⣴⣿⣿⣿⣷⢸⣿⣿⣿⣿⣿⣿⣿⣿⣰⠄⠄⠄",
+        "⣼⡟⡟⣿⢸⣿⣿⣝⢿⣿⣾⣿⣿⣿⢟⣾⣿⣿⣿⣿⣿⣿⣿⣿⠟⠄⡀⡀",
+        "⣿⢰⣿⢹⢸⣿⣿⣿⣷⣝⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠛⠉⠄⠄⣸⢰⡇",
+        "⣿⣾⣹⣏⢸⣿⣿⣿⣿⣿⣷⣍⡻⣛⣛⣛⡉⠁⠄⠄⠄⠄⠄⠄⢀⢇⡏⠄",
+    },
+    {
+        "⢀⣠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⣠⣤⣶⣶",
+        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⢰⣿⣿⣿⣿",
+        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣀⣀⣾⣿⣿⣿⣿",
+        "⣿⣿⣿⣿⣿⡏⠉⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿",
+        "⣿⣿⣿⣿⣿⣿⠀⠀⠀⠈⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⠉⠁⠀⣿",
+        "⣿⣿⣿⣿⣿⣿⣧⡀⠀⠀⠀⠀⠙⠿⠿⠿⠻⠿⠿⠟⠿⠛⠉⠀⠀⠀⠀⠀⣸⣿",
+        "⣿⣿⣿⣿⣿⣿⣿⣷⣄⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⣿",
+        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⣴⣿⣿⣿⣿",
+        "⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⢰⣹⡆⠀⠀⠀⠀⠀⠀⣭⣷⠀⠀⠀⠸⣿⣿⣿⣿",
+        "⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠈⠉⠀⠀⠤⠄⠀⠀⠀⠉⠁⠀⠀⠀⠀⢿⣿⣿⣿",
+        "⣿⣿⣿⣿⣿⣿⣿⣿⢾⣿⣷⠀⠀⠀⠀⡠⠤⢄⠀⠀⠀⠠⣿⣿⣷⠀⢸⣿⣿⣿",
+        "⣿⣿⣿⣿⣿⣿⣿⣿⡀⠉⠀⠀⠀⠀⠀⢄⠀⢀⠀⠀⠀⠀⠉⠉⠁⠀⠀⣿⣿⣿",
+        "⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⣿⣿",
+        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿",
+    },
+    {
+        "⣿⡇⣿⣿⣿⠛⠁⣴⣿⡿⠿⠧⠹⠿⠘⣿⣿⣿⡇⢸⡻⣿⣿⣿⣿⣿⣿⣿",
+        "⢹⡇⣿⣿⣿⠄⣞⣯⣷⣾⣿⣿⣧⡹⡆⡀⠉⢹⡌⠐⢿⣿⣿⣿⡞⣿⣿⣿",
+        "⣾⡇⣿⣿⡇⣾⣿⣿⣿⣿⣿⣿⣿⣿⣄⢻⣦⡀⠁⢸⡌⠻⣿⣿⣿⡽⣿⣿",
+        "⡇⣿⠹⣿⡇⡟⠛⣉⠁⠉⠉⠻⡿⣿⣿⣿⣿⣿⣦⣄⡉⠂⠈⠙⢿⣿⣝⣿",
+        "⠤⢿⡄⠹⣧⣷⣸⡇⠄⠄⠲⢰⣌⣾⣿⣿⣿⣿⣿⣿⣶⣤⣤⡀⠄⠈⠻⢮",
+        "⠄⢸⣧⠄⢘⢻⣿⡇⢀⣀⠄⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⡀⠄⢀",
+        "⠄⠈⣿⡆⢸⣿⣿⣿⣬⣭⣴⣿⣿⣿⣿⣿⣿⣿⣯⠝⠛⠛⠙⢿⡿⠃⠄⢸",
+        "⠄⠄⢿⣿⡀⣿⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣿⣿⣿⣿⡾⠁⢠⡇⢀",
+        "⠄⠄⢸⣿⡇⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣏⣫⣻⡟⢀⠄⣿⣷⣾",
+        "⠄⠄⢸⣿⡇⠄⠈⠙⠿⣿⣿⣿⣮⣿⣿⣿⣿⣿⣿⣿⣿⡿⢠⠊⢀⡇⣿⣿",
+        "⠒⠤⠄⣿⡇⢀⡲⠄⠄⠈⠙⠻⢿⣿⣿⠿⠿⠟⠛⠋⠁⣰⠇⠄⢸⣿⣿⣿",
+        "⠄⠄⠄⣿⡇⢬⡻⡇⡄⠄⠄⠄⡰⢖⠔⠉⠄⠄⠄⠄⣼⠏⠄⠄⢸⣿⣿⣿",
+        "⠄⠄⠄⣿⡇⠄⠙⢌⢷⣆⡀⡾⡣⠃⠄⠄⠄⠄⠄⣼⡟⠄⠄⠄⠄⢿⣿⣿",
+    },
+    {
+        "⣿⢸⣿⣿⣿⣿⣿⢹⣿⣿⣿⣿⣿⢿⣿⡇⡇⣿⣿⡇⢹⣿⣿⣿⣿⣿⣿⠄⢸⣿",
+        "⡟⢸⣿⣿⣭⣭⡭⣼⣶⣿⣿⣿⣿⢸⣧⣇⠇⢸⣿⣿⠈⣿⣿⣿⣿⣿⣿⡆⠘⣿",
+        "⡇⢸⣿⣿⣿⣿⡇⣻⡿⣿⣿⡟⣿⢸⣿⣿⠇⡆⣝⠿⡌⣸⣿⣿⣿⣿⣿⡇⠄⣿",
+        "⢣⢾⣾⣷⣾⣽⣻⣿⣇⣿⣿⣧⣿⢸⣿⣿⡆⢸⣹⣿⣆⢥⢛⡿⣿⣿⣿⡇⠄⣿",
+        "⣛⡓⣉⠉⠙⠻⢿⣿⣿⣟⣻⠿⣹⡏⣿⣿⣧⢸⣧⣿⣿⣨⡟⣿⣿⣿⣿⡇⠄⣿",
+        "⠸⣷⣹⣿⠄⠄⠄⠄⠘⢿⣿⣿⣯⣳⣿⣭⣽⢼⣿⣜⣿⣇⣷⡹⣿⣿⣿⠁⢰⣿",
+        "⠄⢻⣷⣿⡄⢈⠿⠇⢸⣿⣿⣿⣿⣿⣿⣟⠛⠲⢯⣿⣒⡾⣼⣷⡹⣿⣿⠄⣼⣿",
+        "⡄⢸⣿⣿⣷⣬⣽⣯⣾⣿⣿⣿⣿⣿⣿⣿⣿⡀⠄⢀⠉⠙⠛⠛⠳⠽⠿⢠⣿⣿",
+        "⡇⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⢄⣹⡿⠃⠄⠄⣰⠎⡈⣾⣿⣿",
+        "⡇⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⣭⣽⣖⣄⣴⣯⣾⢷⣿⣿⣿",
+        "⣧⠸⣿⣿⣿⣿⣿⣿⠯⠊⠙⢻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣏⣾⣿⣿⣿",
+        "⣿⣦⠹⣿⣿⣿⣿⣿⠄⢀⣴⢾⣼⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⣾⣿⣿⣿⣿",
+        "⣿⣿⣇⢽⣿⣿⣿⡏⣿⣿⣿⣿⣿⡇⣿⣿⣿⣿⡿⣿⣛⣻⠿⣟⣼⣿⣿⣿⣿⢃",
+        "⣿⣿⣿⡎⣷⣽⠻⣇⣿⣿⣿⡿⣟⣵⣿⣟⣽⣾⣿⣿⣿⣿⢯⣾⣿⣿⣿⠟⠱⡟",
+        "⣿⣿⣿⣿⢹⣿⣿⢮⣚⡛⠒⠛⢛⣋⣶⣿⣿⣿⣿⣿⣟⣱⠿⣿⣿⠟⣡⣺⢿",
+    }
+}
+
+local timer = timer or {}
+local timers = {}
+
+function timer.Create(name, delay, times, func)
+    table.insert(timers, {["name"] = name, ["delay"] = delay, ["times"] = times, ["func"] = func, ["lastTime"] = globals.RealTime()})
+end
+
+function timer.Remove(name)
+    for k,v in pairs(timers or {}) do
+        if (name == v["name"]) then table.remove(timers, k) end
+    end
+end
+
+callbacks.Register("DispatchUserMessage", function(msg)
+    if msg:GetID() == 6 then
+        local index = msg:GetInt(1)
+		local message = msg:GetString(4,1)
+        local message2 = msg:GetString(4,1):lower()
+        local m = string.match
+        local ec = enable_chatcmds:GetValue()
+        local ecf = enable_coin_flip:GetValue()
+
+        local player_name = client.GetPlayerNameByIndex(index)
+        local lp = entities.GetLocalPlayer()
+        local lp_name = client.GetPlayerInfo( lp:GetIndex() )[ "Name" ]
+        local number = numbers[math.random(#numbers)]
+        local response = responses[math.random(#responses)]
+        local result = results[math.random(#results)]
+        local thingy = gaydar[math.random(#gaydar)]
+
+        if m(message2, "!roll") and enable_chatcmds:GetValue() and enable_roll:GetValue() then
+            timer.Create("message_delay", 0.7, 1, function()
+                msg = ('%s rolled a %s'):format(player_name, number)
+                client.ChatSay(msg)
+            end)
+        end
+
+        if m(message2, "!8ball") and enable_chatcmds:GetValue() and enable_8ball:GetValue() then
+            timer.Create("message_delay", 0.7, 1, function()
+                client.ChatSay("❽: " .. response)
+            end)
+        end
+
+        if m(message2, "!gay") and enable_chatcmds:GetValue() and enable_gaydar:GetValue() then
+            timer.Create("message_delay", 0.7, 1, function()
+                msg = ('%s %s'):format(player_name, thingy)
+                client.ChatSay(msg)
+            end)
+        end
+
+        if m(message2, "!cf") and ec and ecf or m(message2, "!flip") and ec and ecf or m(message2, "!coin flip") and ec and ecf or m(message2, "!coinflip") and ec and ecf then
+            timer.Create("message_delay", 0.7, 1, function()
+                msg = ('%s %s'):format(player_name, result)
+                client.ChatSay(msg)
+            end)
+        end
+
+        if m(message, "!anime") and ec and enable_anime:GetValue() then
+            random = math.random(1, #anime)
+            for i=1, #anime[random] do
+                timer.Create("message_delay", 0.7, i, function()
+                    client.ChatSay(anime[random][i])
+                end)
+            end
+        end
+
+        if m(message, "!ranks") and ec and enable_ranks:GetValue() then
+            for i, v in next, entities.FindByClass("CCSPlayer") do
+                if v:GetName() ~= "GOTV" and entities.GetPlayerResources():GetPropInt("m_iPing", v:GetIndex()) ~= 0 then
+                    local index = v:GetIndex()
+                    local rank_index = entities.GetPlayerResources():GetPropInt("m_iCompetitiveRanking", index)
+                    local wins = entities.GetPlayerResources():GetPropInt("m_iCompetitiveWins", index)
+                    local rank = ranks[rank_index] or "no rank"
+                    if ranks_mode:GetValue() == 0 then 
+                        timer.Create("message_delay", 0.7, i, function()
+                            client.ChatTeamSay(v:GetName() .. " has " .. wins .. " wins " .. "(" .. rank .. ")")
+                        end)
+
+                    elseif ranks_mode:GetValue() == 1 then 
+                        timer.Create("message_delay", 0.7, i, function()
+                            client.ChatSay(v:GetName() .. " has " .. wins .. " wins " .. "(" .. rank .. ")")
+                        end)
+                    end
+                end
+            end
+        end
+    end
+end)
+
+callbacks.Register("Draw", function()
+    for k,v in pairs(timers or {}) do
+  
+        if (v["times"] <= 0) then table.remove(timers, k) end
+      
+        if (v["lastTime"] + v["delay"] <= globals.RealTime()) then
+            timers[k]["lastTime"] = globals.RealTime()
+            timers[k]["times"] = timers[k]["times"] - 1
+            v["func"]()
+        end  
+    end
+end)
+
+--------Lua Callbacks & Listeners--------
+callbacks.Register('FireGameEvent', for_chatsay)
+callbacks.Register('FireGameEvent', for_throwsay)
+callbacks.Register('CreateMove', CrosshairRecoil)
+callbacks.Register("Draw", UnlockInventory)
+callbacks.Register("Unload", OnUnload)
+client.AllowListener("bomb_beginplant");
+client.AllowListener("bomb_abortplant");
+client.AllowListener("bomb_begindefuse");
+client.AllowListener("bomb_abortdefuse"); 
+client.AllowListener("bomb_defused");
+client.AllowListener("bomb_exploded");
+client.AllowListener("round_officially_ended");
+client.AllowListener("bomb_planted");
+
+callbacks.Register("Draw",Render);
+callbacks.Register("FireGameEvent",EventHook);

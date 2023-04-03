@@ -1,8 +1,7 @@
 --------Auto Update-------- https://aimware.net/forum/thread/151605
 local SCRIPT_FILE_NAME = GetScriptName();
-local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/VngGodCreative/godcreative-lua/main/God%20Creative";
 local VERSION_FILE_ADDR = "https://pastebin.com/raw/ccRYTevK";
-local VERSION_NUMBER = "1.2";
+local VERSION_NUMBER = "1.5";
 local version_check_done = false;
 local update_downloaded = false;
 local update_available = false;
@@ -489,7 +488,6 @@ panorama.RunScript([[
             const is_yesterday = yesterday.toDateString() === date.toDateString();
             const is_this_year = today.getFullYear() === date.getFullYear();
 
-
             if (seconds < 5) {
                 return 'now';
             } else if (seconds < 60) {
@@ -640,7 +638,7 @@ panorama.RunScript([[
                 "panel": `
                     <Button id="nearby_helper_invite_btn"
                         class="IconButton"
-                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'nearby_helper_invite_btn', 'Invite All' );"
+                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'nearby_helper_invite_btn', 'Invite Nearby' );"
                         onmouseout="UiToolkitAPI.HideTextTooltip();">
                         <Image src="file://{images}/icons/ui/invite.svg" />
                     </Button>
@@ -838,7 +836,7 @@ panorama.RunScript([[
                 }
             },
             {
-                title: 'Start Queue',
+                title: 'Bắt đầu tìm trận',
                 cmds: ['startq', 'start', 'q'],
                 enabled: true,
                 exec: (cmd, args, user, steam_id) => {
@@ -848,7 +846,7 @@ panorama.RunScript([[
                 }
             },
             {
-                title: 'Stop Queue',
+                title: 'Dừng Tìm Trận',
                 cmds: ['stopq', 'stop', 'sq'],
                 enabled: true,
                 exec: (cmd, args, user, steam_id) => {
@@ -856,7 +854,7 @@ panorama.RunScript([[
                 }
             },
             {
-                title: 'Restart Queue',
+                title: 'Khởi động lại tìm trận',
                 cmds: ['restartq', 'restart', 'rq'],
                 enabled: true,
                 exec: (cmd, args, user, steam_id) => {
@@ -870,7 +868,7 @@ panorama.RunScript([[
                 }
             },
             {
-                title: 'Maps',
+                title: 'Pick Maps',
                 cmds: ['maps', 'map', 'm'],
                 enabled: true,
                 exec: (cmd, args, user, steam_id) => {
@@ -916,11 +914,11 @@ panorama.RunScript([[
                     }
 
                     if (new_settings.update.game.mapgroupname.length === 0) {
-                        _utils.error(`No maps found!`);
+                        _utils.error(`Không tìm thấy maps!`);
                     } else {
                         const friendly_maps = new_settings.update.game.mapgroupname.map((x) => converted_names[x])
 
-                        _utils.success(`Changed Maps to:`);
+                        _utils.success(`Đổi maps sang:`);
 
                         let chunk = 0
                         for (var i = 0; i < Math.ceil(friendly_maps.length / 4); i++) {
@@ -934,7 +932,7 @@ panorama.RunScript([[
                 }
             },
             {
-                title: 'Gamemode',
+                title: 'Chế độ',
                 cmds: ['gamemode', 'mode', 'gm'],
                 enabled: true,
                 exec: (cmd, args, user, steam_id) => {
@@ -971,7 +969,7 @@ panorama.RunScript([[
                 }
             },
             {
-                title: 'Location',
+                title: 'Check vị trí',
                 cmds: ['locate', 'loc'],
                 enabled: true,
                 exec: (cmd, args, user, steam_id) => {
@@ -983,7 +981,7 @@ panorama.RunScript([[
                     }
 
                     users.forEach((x) => {
-                        _utils.party(`${ep_globals.symbols.location} ${ep_globals.symbols.bullet} ${x.name} đến từ ${ep_globals.locations[x.location]}`);
+                        _utils.party(`${ep_globals.symbols.location} ${ep_globals.symbols.bullet} ${x.name} is from ${ep_globals.locations[x.location]}`);
                     });
                 }
             },
@@ -1093,7 +1091,7 @@ panorama.RunScript([[
                 "panel": `
                     <Button id="start_q_button"
                         class="IconButton"
-                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'start_q_button', 'Start Seaching' );"
+                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'start_q_button', 'Start Match' );"
                         onmouseout="UiToolkitAPI.HideTextTooltip();">
                         <Image src="file://{images}/icons/ui/play.svg" />
                     </Button>
@@ -1107,7 +1105,7 @@ panorama.RunScript([[
                 "panel": `
                     <Button id="stop_q_button"
                         class="IconButton"
-                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'stop_q_button', 'Stop Seaching' );"
+                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'stop_q_button', 'Stop Match' );"
                         onmouseout="UiToolkitAPI.HideTextTooltip();">
                         <Image src="file://{images}/icons/ui/exit.svg" />
                     </Button>
@@ -1121,7 +1119,7 @@ panorama.RunScript([[
                 "panel": `
                     <Button id="restart_q_button"
                         class="IconButton"
-                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'restart_q_button', 'Restart Seaching' );"
+                        onmouseover="UiToolkitAPI.ShowTextTooltip( 'restart_q_button', 'Restart Match' );"
                         onmouseout="UiToolkitAPI.HideTextTooltip();">
                         <Image src="file://{images}/icons/ui/refresh.svg" />
                     </Button>
@@ -1211,7 +1209,7 @@ panorama.RunScript([[
             });
 
             players.forEach((x) => {
-                let title = `${ep_globals.symbols.location} ${ep_globals.symbols.bullet} ${x.name} đến từ ${ep_globals.locations[x.location]}`;
+                let title = `${ep_globals.symbols.location} ${ep_globals.symbols.bullet} ${x.name} is from ${ep_globals.locations[x.location]}`;
                 let message = title.split(' ').join('\u{00A0}');
                 let xuid = MyPersonaAPI.GetXuid();
                 if (!xuid) return false;
@@ -1479,8 +1477,6 @@ end
 end)
 
 --------VoteRevealer--------
--- Vote revealer by Cheeseot
-
 local activeVotes = {};
 local font = draw.CreateFont('Arial', 14, 14);
 local votecolor = {};
@@ -1579,9 +1575,6 @@ end;
 
 callbacks.Register("DispatchUserMessage", getVoteEnd)
 
--- Vote revealer by Cheeseot
-
-
 local function add(time, ...)
     table.insert(activeVotes, {
         ["text"] = { ... },
@@ -1654,9 +1647,6 @@ local function showVotes(count, color, text, layer)
     drawMultiColorText(layer.x_pad_b - mw + 18, y + 9, text)
 end
 
--- Vote revealer by Cheeseot
-
-
 local function voteCast(e)
     if (e:GetName() == "vote_cast") then
 		timerRemove("sleep")
@@ -1706,7 +1696,6 @@ callbacks.Register('Draw', makeVote)
 
 client.AllowListener("vote_cast")
 
-
 local function drawVote()
 local font2 = draw.CreateFont('Arial', 20, 20);
 draw.SetFont(font2)
@@ -1753,7 +1742,6 @@ local votetypename = ""
             draw.Text(50, scrnh/2 + scrnh/36, "Vote Failed")  
 		end
 	end
-
 
 end
 
@@ -1925,8 +1913,7 @@ local function drawWatermark()
  
     local divider = ' | ';
     local cheatName = 'gamesense';
- 
- 
+
     local watermarkText = cheatName .. divider .. handler_variables.user_name .. divider .. "ping: " ..  handler_variables.ping .. "ms" .. divider .. 
                           "fps: " .. string.format("%0.1f", handler_variables.fps)
 
@@ -1946,7 +1933,6 @@ local function drawWatermark()
     draw.Color(255,255,255,255);
     draw.Text(start_x + weightPadding / 2+4 - 20, start_y + heightPadding / 2 - 1, watermarkText );
  
- 
     draw.Color(color_r, color_g, color_b, color_a, 255);
     draw.FilledRect(start_x - 10, start_y, start_x + watermarkWidth - 20, start_y +2);
 end
@@ -1959,35 +1945,10 @@ callbacks.Register("Draw", function()
     drawWatermark()
 end)
 
---------Draw Image--------
-local function OnUnload()
-client.Command("toggleconsole", true)
-
-	client.Command('echo "⠄⠄⠄⢰⣧⣼⣯⠄⣸⣠⣶⣶⣦⣾⠄⠄⠄⠄⡀⠄⢀⣿⣿⠄⠄⠄⢸⡇⠄⠄"', true)
-	client.Command('echo "⠄⠄⠄⣾⣿⠿⠿⠶⠿⢿⣿⣿⣿⣿⣦⣤⣄⢀⡅⢠⣾⣛⡉⠄⠄⠄⠸⢀⣿⠄"', true)
-	client.Command('echo "⠄⠄⢀⡋⣡⣴⣶⣶⡀⠄⠄⠙⢿⣿⣿⣿⣿⣿⣴⣿⣿⣿⢃⣤⣄⣀⣥⣿⣿⠄"', true)
-	client.Command('echo "⠄⠄⢸⣇⠻⣿⣿⣿⣧⣀⢀⣠⡌⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⣿⣿⣿⠄"', true)
-	client.Command('echo "⠄⢀⢸⣿⣷⣤⣤⣤⣬⣙⣛⢿⣿⣿⣿⣿⣿⣿⡿⣿⣿⡍⠄⠄⢀⣤⣄⠉⠋⣰"', true)
-	client.Command('echo "⠄⣼⣖⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣿⣿⣿⢇⣿⣿⡷⠶⠶⢿⣿⣿⠇⢀⣤"', true)
-	client.Command('echo "⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣿⡇⣿⣿⣿⣿⣿⣿⣷⣶⣥⣴⣿⡗"', true)
-	client.Command('echo "⢀⠈⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠄"', true)
-	client.Command('echo "⢸⣿⣦⣌⣛⣻⣿⣿⣧⠙⠛⠛⡭⠅⠒⠦⠭⣭⡻⣿⣿⣿⣿⣿⣿⣿⣿⡿⠃⠄"', true)
-	client.Command('echo "⠘⣿⣿⣿⣿⣿⣿⣿⣿⡆⠄⠄⠄⠄⠄⠄⠄⠄⠹⠈⢋⣽⣿⣿⣿⣿⣵⣾⠃⠄"', true)
-	client.Command('echo "⠄⠘⣿⣿⣿⣿⣿⣿⣿⣿⠄⣴⣿⣶⣄⠄⣴⣶⠄⢀⣾⣿⣿⣿⣿⣿⣿⠃⠄⠄"', true)
-	client.Command('echo "⠄⠄⠈⠻⣿⣿⣿⣿⣿⣿⡄⢻⣿⣿⣿⠄⣿⣿⡀⣾⣿⣿⣿⣿⣛⠛⠁⠄⠄⠄"', true)
-	client.Command('echo "⠄⠄⠄⠄⠈⠛⢿⣿⣿⣿⠁⠞⢿⣿⣿⡄⢿⣿⡇⣸⣿⣿⠿⠛⠁⠄⠄⠄⠄⠄"', true)
-	client.Command('echo "⠄⠄⠄⠄⠄⠄⠄⠉⠻⣿⣿⣾⣦⡙⠻⣷⣾⣿⠃⠿⠋⠁⠄⠄⠄⠄⠄⢀⣠⣴"', true)
-	client.Command('echo "⣿⣿⣿⣶⣶⣮⣥⣒⠲⢮⣝⡿⣿⣿⡆⣿⡿⠃⠄⠄⠄⠄⠄⠄⠄⣠⣴⣿⣿⣿"', true)
-
-	if clantagset == 1 then
-		set_clantag("", "")
-	end
-end
-
 --------Miscellaneous--------
 client.Command("+right", true)
 client.Command("+left", true)
-client.Command("snd_menumusic_volume 50", true)
+client.Command("snd_menumusic_volume 30", true)
 client.Command("cl_timeout 0 0 0 7", true)
 
 --------Engine Radar--------
@@ -2260,20 +2221,38 @@ callbacks.Register("Draw", function()
     end
 end)
 
---------Lua Callbacks & Listeners--------
-callbacks.Register('FireGameEvent', for_chatsay)
-callbacks.Register('FireGameEvent', for_throwsay)
-callbacks.Register('CreateMove', CrosshairRecoil)
-callbacks.Register("Draw", UnlockInventory)
-callbacks.Register("Unload", OnUnload)
-client.AllowListener("bomb_beginplant");
-client.AllowListener("bomb_abortplant");
-client.AllowListener("bomb_begindefuse");
-client.AllowListener("bomb_abortdefuse"); 
-client.AllowListener("bomb_defused");
-client.AllowListener("bomb_exploded");
-client.AllowListener("round_officially_ended");
-client.AllowListener("bomb_planted");
+--------Draw Image--------
+local function OnUnload()
+client.Command("toggleconsole", true)
+  client.Command('echo "bye, hope u comeback without this lua again :3', true)
+  client.Command('echo "᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼', true)
+  client.Command('echo "⠄⠄⠄.⣧⣼⣯⠄⣸⣠⣶⣶⣦⣾⠄⠄⠄⠄⡀⠄⢀⣿⣿⠄⠄⠄⢸⡇⠄⠄"', true)
+	client.Command('echo "⠄⠄⠄⢰⣧⣼⣯⠄⣸⣠⣶⣶⣦⣾⠄⠄⠄⠄⡀⠄⢀⣿⣿⠄⠄⠄⢸⡇⠄⠄"', true)
+	client.Command('echo "⠄⠄⠄⣾⣿⠿⠿⠶⠿⢿⣿⣿⣿⣿⣦⣤⣄⢀⡅⢠⣾⣛⡉⠄⠄⠄⠸⢀⣿⠄"', true)
+	client.Command('echo "⠄⠄⢀⡋⣡⣴⣶⣶⡀⠄⠄⠙⢿⣿⣿⣿⣿⣿⣴⣿⣿⣿⢃⣤⣄⣀⣥⣿⣿⠄"', true)
+	client.Command('echo "⠄⠄⢸⣇⠻⣿⣿⣿⣧⣀⢀⣠⡌⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⣿⣿⣿⠄"', true)
+	client.Command('echo "⠄⢀⢸⣿⣷⣤⣤⣤⣬⣙⣛⢿⣿⣿⣿⣿⣿⣿⡿⣿⣿⡍⠄⠄⢀⣤⣄⠉⠋⣰"', true)
+	client.Command('echo "⠄⣼⣖⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣿⣿⣿⢇⣿⣿⡷⠶⠶⢿⣿⣿⠇⢀⣤"', true)
+	client.Command('echo "⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣿⡇⣿⣿⣿⣿⣿⣿⣷⣶⣥⣴⣿⡗"', true)
+	client.Command('echo "⢀⠈⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠄"', true)
+	client.Command('echo "⢸⣿⣦⣌⣛⣻⣿⣿⣧⠙⠛⠛⡭⠅⠒⠦⠭⣭⡻⣿⣿⣿⣿⣿⣿⣿⣿⡿⠃⠄"', true)
+	client.Command('echo "⠘⣿⣿⣿⣿⣿⣿⣿⣿⡆⠄⠄⠄⠄⠄⠄⠄⠄⠹⠈⢋⣽⣿⣿⣿⣿⣵⣾⠃⠄"', true)
+	client.Command('echo "⠄⠘⣿⣿⣿⣿⣿⣿⣿⣿⠄⣴⣿⣶⣄⠄⣴⣶⠄⢀⣾⣿⣿⣿⣿⣿⣿⠃⠄⠄"', true)
+	client.Command('echo "⠄⠄⠈⠻⣿⣿⣿⣿⣿⣿⡄⢻⣿⣿⣿⠄⣿⣿⡀⣾⣿⣿⣿⣿⣛⠛⠁⠄⠄⠄"', true)
+	client.Command('echo "⠄⠄⠄⠄⠈⠛⢿⣿⣿⣿⠁⠞⢿⣿⣿⡄⢿⣿⡇⣸⣿⣿⠿⠛⠁⠄⠄⠄⠄⠄"', true)
+	client.Command('echo "⠄⠄⠄⠄⠄⠄⠄⠉⠻⣿⣿⣾⣦⡙⠻⣷⣾⣿⠃⠿⠋⠁⠄⠄⠄⠄⠄⢀⣠⣴"', true)
+	client.Command('echo "⣿⣿⣿⣶⣶⣮⣥⣒⠲⢮⣝⡿⣿⣿⡆⣿⡿⠃⠄⠄⠄⠄⠄⠄⠄⣠⣴⣿⣿⣿"', true)
 
+	if clantagset == 1 then
+		set_clantag("", "")
+	end
+end
+
+--------Lua Callbacks & Listeners--------
+callbacks.Register('FireGameEvent', for_chatsay);
+callbacks.Register('FireGameEvent', for_throwsay);
+callbacks.Register('CreateMove', CrosshairRecoil);
+callbacks.Register("Draw", UnlockInventory);
+callbacks.Register("Unload", OnUnload);
 callbacks.Register("Draw",Render);
 callbacks.Register("FireGameEvent",EventHook);

@@ -1,6 +1,6 @@
 --------Auto Update-------- https://aimware.net/forum/thread/151605
 local SCRIPT_FILE_NAME = GetScriptName();
-local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/VngGodCreative/godcreative-lua/main/God%20Creative";
+local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/VngGodCreative/godcreative-lua/main/version%20update";
 local VERSION_NUMBER = "1.5";
 local version_check_done = false;
 local update_downloaded = false;

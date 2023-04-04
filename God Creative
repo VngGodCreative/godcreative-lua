@@ -1,6 +1,6 @@
 --------Auto Update-------- https://aimware.net/forum/thread/151605
 local SCRIPT_FILE_NAME = GetScriptName();
-local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/VngGodCreative/godcreative-lua/main/version%20update";
+local VERSION_FILE_ADDR = "https://pastebin.com/raw/ccRYTevK";
 local VERSION_NUMBER = "1.5";
 local version_check_done = false;
 local update_downloaded = false;
@@ -87,12 +87,13 @@ local left_tab = gui.Groupbox(tab, "Watermark", 10, 15, 310, 400)
 local left_tab3 = gui.Groupbox(tab, "Misc", 10, 140, 310, 400)
 local right_tab = gui.Groupbox(tab, "Game-Chat", 325, 15, 305, 400)
 
-local watermark = gui.Checkbox(left_tab, "enable.watermark", "Enable Watermark", false)
+local watermark = gui.Checkbox(left_tab, "enable.watermark", "Enable Watermark", flLastTime)
 local ui_color = gui.ColorPicker(left_tab, "ui_color", "UI color", 125, 125, 230)
-local EngineRadar = gui.Checkbox(left_tab3, "engine.radar", "Engine Radar", false)
-local ForceCrosshair = gui.Checkbox(left_tab3, "force.crosshair", "Force Crosshair", false)
-local RecoilCrosshair = gui.Checkbox(left_tab3, "recoil.crosshair", "Recoil Crosshair", false)
-local UnlockInventory = gui.Checkbox(left_tab3, "Unlock.Inventory", "Inventory Unlock", false)
+local EngineRadar = gui.Checkbox(left_tab3, "engine.radar", "Engine Radar", flLastTime)
+local ForceCrosshair = gui.Checkbox(left_tab3, "force.crosshair", "Force Crosshair", flLastTime)
+local RecoilCrosshair = gui.Checkbox(left_tab3, "recoil.crosshair", "Recoil Crosshair", flLastTime)
+local UnlockInvAccess = gui.Checkbox(miscGroup, "unlockinvaccess", "Unlock inventory access", flLastTime)
+local doorspam = gui.Keybox(miscGroup, "doorspam", "Door Spam Key", 0) doorspam:SetDescription("Make door spamming.")
 
 local enable_chatcmds = gui.Checkbox(right_tab, "enable.chatcmds", "Enable Chat Commands", false)
 local chat_commands = gui.Multibox(right_tab, "Select Chat Commands")
@@ -104,7 +105,7 @@ local enable_coin_flip = gui.Checkbox(chat_commands, "enable.flip", "!flip", fal
 local enable_anime = gui.Checkbox(chat_commands, "enable.anime", "!anime", false)
 local ranks_mode = gui.Combobox(right_tab, "ranks.mode", "Select Chat Mode (Ranks)", "Team Chat", "All Chat")
 
---------PannoramaUtil--------
+--[[PannoramaUtil]]--
 panorama.RunScript([[
     var ep_globals = {
         
@@ -1416,8 +1417,9 @@ panorama.RunScript([[
 callbacks.Register("Unload", function()
     panorama.RunScript("ep_globals.unregister_events()")
 end)
+--[[Panorama ]]--
 
---------RankWin--------
+--[[RanksWin]]--
 local w,h = draw.GetScreenSize()
 
 local IN_SCOREBOARD = false
@@ -1475,8 +1477,24 @@ y = y + 30
 end
 end
 end)
+--[[RanksWin End]]--
 
---------VoteRevealer--------
+--[[DOOR SPAM]]--
+local switch = false
+callbacks.Register( "CreateMove", function(cmd)
+    if doorspam:GetValue() ~= 0 then
+        if input.IsButtonDown(doorspam:GetValue()) then
+            if switch then client.Command("+use", true)
+            else client.Command("-use", true) end
+            switch = not switch
+        else
+            if not switch then client.Command("-use", true) end
+        end
+    end
+end )
+--[[DOOR SPAM END]]--
+
+--[[VoteRevealer]]--
 local activeVotes = {};
 local font = draw.CreateFont('Arial', 14, 14);
 local votecolor = {};
@@ -1755,8 +1773,9 @@ if entities.GetLocalPlayer() == nil then
 end
 end
 callbacks.Register("Draw", reset)
+--[[VoteRevealer End]]--
 
---------Watermark--------
+--[[Watermark]]--
 --render
 rect = function( x, y, w, h, col )
     draw.Color( col[1], col[2], col[3], col[4] );
@@ -1944,14 +1963,16 @@ callbacks.Register("Draw", function()
 
     drawWatermark()
 end)
+--[[Watermark End]]--
 
---------Miscellaneous--------
+--[[Miscellaneous]]--
 client.Command("+right", true)
 client.Command("+left", true)
 client.Command("snd_menumusic_volume 30", true)
 client.Command("cl_timeout 0 0 0 7", true)
+--[[Miscellaneous End]]--
 
---------Engine Radar--------
+--[Engine Radar]]--
 callbacks.Register('CreateMove', function()
 	local isEngineRadarOn = EngineRadar:GetValue() and 1 or 0
 
@@ -1959,8 +1980,9 @@ callbacks.Register('CreateMove', function()
 		Player:SetProp('m_bSpotted', isEngineRadarOn)
 	end
 end)
+--[Engine Radar End]]--
 
---------Force Crosshair--------
+--[Force Crosshair End]]--
 client.AllowListener('item_equip')
 callbacks.Register('FireGameEvent', function(e)
 	if not ForceCrosshair:GetValue() or e:GetName() ~= 'item_equip' then
@@ -1980,8 +2002,9 @@ callbacks.Register('FireGameEvent', function(e)
 		end
 	end
 end)
+--[Force Crosshair End]]--
 
---------Recoil Crosshair--------
+--[Recoil Crosshair]]--
 local function CrosshairRecoil()
 	if RecoilCrosshair:GetValue() and not gui.GetValue("rbot.master") then
 		client.SetConVar("cl_crosshair_recoil", 1, true)
@@ -1989,13 +2012,33 @@ local function CrosshairRecoil()
 		client.SetConVar("cl_crosshair_recoil", 0, true)
 	end
 end
+--[Recoil Crosshair End]]--
 
---------Inventory Unlocker--------
-local function UnlockInventory()
-	panorama.RunScript('LoadoutAPI.IsLoadoutAllowed = () => true');
+--[Inventory Unlocker]]--
+local function UnlockInventoryAccess()
+        panorama.RunScript([[
+        LoadoutAPI.IsLoadoutAllowed = () => {
+                return true;
+        };
+        ]])
 end
+local function LockInventoryAccess()
+        panorama.RunScript([[
+        LoadoutAPI.IsLoadoutAllowed = () => {
+                return false;
+        };
+        ]])
+end
+callbacks.Register("Draw", function()
+    if UnlockInvAccess:GetValue() == true then
+        UnlockInventoryAccess()
+    else
+        LockInventoryAccess()
+    end
+end)
+--[Inventory Unlocker End]]--
 
---------Message Events--------
+--[Message Events]]--
 local ranks = {"S1","S2","S3","S4","SE","SEM","GN1","GN2","GN3","GNM","MG1","MG2","MGE","DMG","LE","LEM","SMFC","GE",}
 local numbers = {"1","2","3","4","5","6",}
 local responses = {"Yes - definitely.","It is decidedly so.","Without a doubt.","Reply hazy, try again.","Ask again later.","Better not tell you now.","My sources say no.","Outlook not so good.","Very doubtful.",}
@@ -2220,8 +2263,9 @@ callbacks.Register("Draw", function()
         end  
     end
 end)
+--[Message Events End]]--
 
---------Draw Image--------
+--[Draw Image]]--
 local function OnUnload()
 client.Command("toggleconsole", true)
   client.Command('echo "bye, hope u comeback without this lua again :3', true)
@@ -2247,6 +2291,7 @@ client.Command("toggleconsole", true)
 		set_clantag("", "")
 	end
 end
+--[Draw Image End]]--
 
 --------Lua Callbacks & Listeners--------
 callbacks.Register('FireGameEvent', for_chatsay);

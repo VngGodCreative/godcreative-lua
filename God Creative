@@ -79,31 +79,38 @@ callbacks.Register( "Draw", "handleUpdates", function()
 	end
 end)
 
---------GUI Stuff--------
+--[[GUI Stuff]]--
 local misc_ref = gui.Reference("Misc")
 local tab = gui.Tab(misc_ref, "GOD Creative ", ("GOD Creative v" .. VERSION_NUMBER))
 
 local left_tab = gui.Groupbox(tab, "Watermark", 10, 15, 310, 400)
 local left_tab3 = gui.Groupbox(tab, "Misc", 10, 140, 310, 400)
 local right_tab = gui.Groupbox(tab, "Game-Chat", 325, 15, 305, 400)
+local rainbow_hudGroup = gui.Groupbox(tab, "Rainbow HUD", 325,217,296,100)
 
 local watermark = gui.Checkbox(left_tab, "enable.watermark", "Enable Watermark", flLastTime)
 local ui_color = gui.ColorPicker(left_tab, "ui_color", "UI color", 125, 125, 230)
 local EngineRadar = gui.Checkbox(left_tab3, "engine.radar", "Engine Radar", flLastTime)
 local ForceCrosshair = gui.Checkbox(left_tab3, "force.crosshair", "Force Crosshair", flLastTime)
 local RecoilCrosshair = gui.Checkbox(left_tab3, "recoil.crosshair", "Recoil Crosshair", flLastTime)
-local UnlockInvAccess = gui.Checkbox(miscGroup, "unlockinvaccess", "Unlock inventory access", flLastTime)
-local doorspam = gui.Keybox(miscGroup, "doorspam", "Door Spam Key", 0) doorspam:SetDescription("Make door spamming.")
+local UnlockInvAccess = gui.Checkbox(left_tab3, "unlockinvaccess", "Unlock inventory access", flLastTime)
+local doorspam = gui.Keybox(left_tab3, "doorspam", "Door Spam Key", 0) 
+doorspam:SetDescription("Make door spamming.")
 
-local enable_chatcmds = gui.Checkbox(right_tab, "enable.chatcmds", "Enable Chat Commands", false)
-local chat_commands = gui.Multibox(right_tab, "Select Chat Commands")
-local enable_ranks = gui.Checkbox(chat_commands, "enable.ranks", "!ranks", false)
-local enable_roll = gui.Checkbox(chat_commands, "enable.roll", "!roll", false)
-local enable_8ball = gui.Checkbox(chat_commands, "enable.8ball", "!8ball", false)
-local enable_gaydar = gui.Checkbox(chat_commands, "enable.gaydar", "!gay", false)
-local enable_coin_flip = gui.Checkbox(chat_commands, "enable.flip", "!flip", false)
-local enable_anime = gui.Checkbox(chat_commands, "enable.anime", "!anime", false)
+local enable_chatcmds = gui.Checkbox(right_tab, "enable.chatcmds", "Enable Chat Commands", flLastTime)
 local ranks_mode = gui.Combobox(right_tab, "ranks.mode", "Select Chat Mode (Ranks)", "Team Chat", "All Chat")
+local chat_commands = gui.Multibox(right_tab, "Select Chat Commands")
+local enable_ranks = gui.Checkbox(chat_commands, "enable.ranks", "!ranks", flLastTime)
+local enable_roll = gui.Checkbox(chat_commands, "enable.roll", "!roll", flLastTime)
+local enable_8ball = gui.Checkbox(chat_commands, "enable.8ball", "!8ball", flLastTime)
+local enable_gaydar = gui.Checkbox(chat_commands, "enable.gaydar", "!gay", flLastTime)
+local enable_coin_flip = gui.Checkbox(chat_commands, "enable.flip", "!flip", flLastTime)
+local enable_anime = gui.Checkbox(chat_commands, "enable.anime", "!anime", flLastTime)
+local rainbowcheckbox = gui.Checkbox(rainbow_hudGroup, "enable", "Rainbow Hud",flLastTime)
+rainbowcheckbox:SetDescription("Make's your HUD rainbow.")
+local rainbowslider = gui.Slider(rainbow_hudGroup, "interval", "Rainbow HUD Interval", 1, 0, 10, 0.05)
+rainbowslider:SetDescription("Interval of color switch.")
+--[[GUI Stuff End]]--
 
 --[[PannoramaUtil]]--
 panorama.RunScript([[
@@ -1417,7 +1424,28 @@ panorama.RunScript([[
 callbacks.Register("Unload", function()
     panorama.RunScript("ep_globals.unregister_events()")
 end)
---[[Panorama ]]--
+--[[Panorama Util End]]--
+
+--[[RAINBOW HUD START]]--
+local color = 1
+local time = globals.CurTime()
+local orig = client.GetConVar( "cl_hud_color" )
+local function RainbowHud()
+    if rainbowcheckbox:GetValue() then
+        client.Command( "cl_hud_color " .. color, true )
+        if globals.CurTime() - rainbowslider:GetValue() >= time then
+            color = color + 1
+            time = globals.CurTime()
+        end
+        if color > 9 then color = 1 end
+    else
+        client.Command( "cl_hud_color " .. orig, true )
+    end
+end
+callbacks.Register( "Draw", function()
+    RainbowHud()
+end)
+--[[RAINBOW HUD END]]--
 
 --[[RanksWin]]--
 local w,h = draw.GetScreenSize()
@@ -2269,7 +2297,7 @@ end)
 local function OnUnload()
 client.Command("toggleconsole", true)
   client.Command('echo "bye, hope u comeback without this lua again :3', true)
-  client.Command('echo "᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼᲼', true)
+  client.Command('echo "----------------------------------------------', true)
   client.Command('echo "⠄⠄⠄.⣧⣼⣯⠄⣸⣠⣶⣶⣦⣾⠄⠄⠄⠄⡀⠄⢀⣿⣿⠄⠄⠄⢸⡇⠄⠄"', true)
 	client.Command('echo "⠄⠄⠄⢰⣧⣼⣯⠄⣸⣠⣶⣶⣦⣾⠄⠄⠄⠄⡀⠄⢀⣿⣿⠄⠄⠄⢸⡇⠄⠄"', true)
 	client.Command('echo "⠄⠄⠄⣾⣿⠿⠿⠶⠿⢿⣿⣿⣿⣿⣦⣤⣄⢀⡅⢠⣾⣛⡉⠄⠄⠄⠸⢀⣿⠄"', true)

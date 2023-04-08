@@ -1,13 +1,13 @@
---------Auto Update-------- https://aimware.net/forum/thread/151605
+--[[Auto Update]]--
 local SCRIPT_FILE_NAME = GetScriptName();
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/VngGodCreative/godcreative-lua/main/version%20update";
-local VERSION_NUMBER = "1.6";
+local VERSION_NUMBER = "1.8";
 local version_check_done = false;
 local update_downloaded = false;
 local update_available = false;
 local up_to_date = false;
-local updaterfont1 = draw.CreateFont("Bahnschrift", 18);
-local updaterfont2 = draw.CreateFont("Bahnschrift", 14);
+local updaterfont1 = draw.CreateFont("Arial", 16);
+local updaterfont2 = draw.CreateFont("Arial", 14);
 local updateframes = 0;
 local fadeout = 0;
 local spacing = 0;
@@ -44,7 +44,7 @@ callbacks.Register( "Draw", "handleUpdates", function()
 		draw.Text(7 + draw.GetTextSize("GOD Creative ") - 650 + fadein, 7, "Script");
 		draw.Color(0,180,255,255 - fadeout);
 		draw.Text(7 + draw.GetTextSize("GOD Creative Script ") - 650 + fadein, 7, "\\");
-		spacing = draw.GetTextSize("GOD Creative Script  \\  ");
+		spacing = draw.GetTextSize("GOD Creative Script  \\ ");
 		draw.SetFont(updaterfont2);
 		draw.Color(225,225,225,255 - fadeout);
 	end
@@ -60,7 +60,7 @@ callbacks.Register( "Draw", "handleUpdates", function()
 	end
 	
     if (update_downloaded) and updateframes < 5.5 then
-		draw.Text(7 + spacing - 650 + fadein, 9, "Update available, please reload the script.");
+		draw.Text(7 + spacing - 650 + fadein, 9, "Update available, please reload Lua.");
     end
 
     if (not version_check_done) then
@@ -78,15 +78,17 @@ callbacks.Register( "Draw", "handleUpdates", function()
 		draw.Text(7 + spacing - 650 + fadein, 9, "Successfully loaded latest version: v" .. VERSION_NUMBER);
 	end
 end)
+--[[Auto Update End]]--
 
 --[[GUI Stuff]]--
 local misc_ref = gui.Reference("Misc")
 local tab = gui.Tab(misc_ref, "GOD Creative ", ("GOD Creative v" .. VERSION_NUMBER))
 
-local left_tab = gui.Groupbox(tab, "Watermark", 10, 15, 310, 400)
-local left_tab3 = gui.Groupbox(tab, "Misc", 10, 140, 310, 400)
-local right_tab = gui.Groupbox(tab, "Game-Chat", 325, 15, 305, 400)
-local rainbow_hudGroup = gui.Groupbox(tab, "Rainbow HUD", 325,217,296,100)
+local left_tab = gui.Groupbox(tab, "Watermark", 10, 15, 300, 350)
+local left_tab3 = gui.Groupbox(tab, "Misc", 10, 140, 300, 350)
+local left_tab4 = gui.Groupbox(tab, "Create Lobby", 10, 380, 300, 350)
+local right_tab = gui.Groupbox(tab, "Game-Chat", 325, 15, 300, 350)
+local rainbow_hudGroup = gui.Groupbox(tab, "Rainbow HUD", 325,217,300,350)
 
 local watermark = gui.Checkbox(left_tab, "enable.watermark", "Enable Watermark", flLastTime)
 local ui_color = gui.ColorPicker(left_tab, "ui_color", "UI color", 125, 125, 230)
@@ -94,8 +96,11 @@ local EngineRadar = gui.Checkbox(left_tab3, "engine.radar", "Engine Radar", flLa
 local ForceCrosshair = gui.Checkbox(left_tab3, "force.crosshair", "Force Crosshair", flLastTime)
 local RecoilCrosshair = gui.Checkbox(left_tab3, "recoil.crosshair", "Recoil Crosshair", flLastTime)
 local UnlockInvAccess = gui.Checkbox(left_tab3, "unlockinvaccess", "Unlock inventory access", flLastTime)
-local doorspam = gui.Keybox(left_tab3, "doorspam", "Door Spam Key", 0) 
+local doorspam = gui.Keybox(left_tab3, "doorspam", "Door Spam Key", 0)
 doorspam:SetDescription("Make door spamming.")
+local m_CreateSession = gui.Button(left_tab4, "Create Lobby", function()
+panorama.RunScript("FriendsListAPI.ActionInviteFriend('0', '');") end)
+m_CreateSession:SetWidth(268)
 
 local enable_chatcmds = gui.Checkbox(right_tab, "enable.chatcmds", "Enable Chat Commands", flLastTime)
 local ranks_mode = gui.Combobox(right_tab, "ranks.mode", "Select Chat Mode (Ranks)", "Team Chat", "All Chat")
@@ -111,6 +116,10 @@ rainbowcheckbox:SetDescription("Make's your HUD rainbow.")
 local rainbowslider = gui.Slider(rainbow_hudGroup, "interval", "Rainbow HUD Interval", 1, 0, 10, 0.05)
 rainbowslider:SetDescription("Interval of color switch.")
 --[[GUI Stuff End]]--
+
+--[[Troll]]--
+
+--[[Troll End]]--
 
 --[[PannoramaUtil]]--
 panorama.RunScript([[

@@ -1,4 +1,5 @@
 --[[Auto Update]]--
+local author = "Creative";
 local SCRIPT_FILE_NAME = GetScriptName();
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/VngGodCreative/godcreative-lua/main/version%20update";
 local VERSION_NUMBER = "1.8";
@@ -6,8 +7,8 @@ local version_check_done = false;
 local update_downloaded = false;
 local update_available = false;
 local up_to_date = false;
-local updaterfont1 = draw.CreateFont("Arial", 16);
-local updaterfont2 = draw.CreateFont("Arial", 14);
+local updaterfont1 = draw.CreateFont("Bahnschrift", 18);
+local updaterfont2 = draw.CreateFont("Bahnschrift", 14);
 local updateframes = 0;
 local fadeout = 0;
 local spacing = 0;
@@ -44,7 +45,7 @@ callbacks.Register( "Draw", "handleUpdates", function()
 		draw.Text(7 + draw.GetTextSize("GOD Creative ") - 650 + fadein, 7, "Script");
 		draw.Color(0,180,255,255 - fadeout);
 		draw.Text(7 + draw.GetTextSize("GOD Creative Script ") - 650 + fadein, 7, "\\");
-		spacing = draw.GetTextSize("GOD Creative Script  \\ ");
+		spacing = draw.GetTextSize("GOD Creative Script  \\  ");
 		draw.SetFont(updaterfont2);
 		draw.Color(225,225,225,255 - fadeout);
 	end
@@ -60,7 +61,7 @@ callbacks.Register( "Draw", "handleUpdates", function()
 	end
 	
     if (update_downloaded) and updateframes < 5.5 then
-		draw.Text(7 + spacing - 650 + fadein, 9, "Update available, please reload Lua.");
+		draw.Text(7 + spacing - 650 + fadein, 9, "Update available, please reload the script.");
     end
 
     if (not version_check_done) then
@@ -85,41 +86,75 @@ local misc_ref = gui.Reference("Misc")
 local tab = gui.Tab(misc_ref, "GOD Creative ", ("GOD Creative v" .. VERSION_NUMBER))
 
 local left_tab = gui.Groupbox(tab, "Watermark", 10, 15, 300, 350)
+local left_tab2 = gui.Groupbox(tab, "Switch Legit - Rage", 10, 380, 300, 350)
 local left_tab3 = gui.Groupbox(tab, "Misc", 10, 140, 300, 350)
-local left_tab4 = gui.Groupbox(tab, "Create Lobby", 10, 380, 300, 350)
-local right_tab = gui.Groupbox(tab, "Game-Chat", 325, 15, 300, 350)
-local rainbow_hudGroup = gui.Groupbox(tab, "Rainbow HUD", 325,217,300,350)
+local right_tab = gui.Groupbox(tab, "Game-Chat", 320, 15, 300, 350)
+local right_tab2 = gui.Groupbox(tab, "Troll Lobby", 320, 387, 300, 350)
+local rainbow_hudGroup = gui.Groupbox(tab, "Rainbow HUD", 320,217,300,350)
 
-local watermark = gui.Checkbox(left_tab, "enable.watermark", "Enable Watermark", flLastTime)
+local watermark = gui.Checkbox(left_tab, "enable.watermark", "Enable Watermark", 0)
 local ui_color = gui.ColorPicker(left_tab, "ui_color", "UI color", 125, 125, 230)
-local EngineRadar = gui.Checkbox(left_tab3, "engine.radar", "Engine Radar", flLastTime)
-local ForceCrosshair = gui.Checkbox(left_tab3, "force.crosshair", "Force Crosshair", flLastTime)
-local RecoilCrosshair = gui.Checkbox(left_tab3, "recoil.crosshair", "Recoil Crosshair", flLastTime)
-local UnlockInvAccess = gui.Checkbox(left_tab3, "unlockinvaccess", "Unlock inventory access", flLastTime)
+local EngineRadar = gui.Checkbox(left_tab3, "engine.radar", "Engine Radar", 0)
+local ForceCrosshair = gui.Checkbox(left_tab3, "force.crosshair", "Force Crosshair", 0)
+local RecoilCrosshair = gui.Checkbox(left_tab3, "recoil.crosshair", "Recoil Crosshair", 0)
+local UnlockInvAccess = gui.Checkbox(left_tab3, "unlockinvaccess", "Unlock inventory access", 0)
 local doorspam = gui.Keybox(left_tab3, "doorspam", "Door Spam Key", 0)
 doorspam:SetDescription("Make door spamming.")
-local m_CreateSession = gui.Button(left_tab4, "Create Lobby", function()
-panorama.RunScript("FriendsListAPI.ActionInviteFriend('0', '');") end)
-m_CreateSession:SetWidth(268)
 
-local enable_chatcmds = gui.Checkbox(right_tab, "enable.chatcmds", "Enable Chat Commands", flLastTime)
+local enable_chatcmds = gui.Checkbox(right_tab, "enable.chatcmds", "Enable Chat Commands", 0)
 local ranks_mode = gui.Combobox(right_tab, "ranks.mode", "Select Chat Mode (Ranks)", "Team Chat", "All Chat")
 local chat_commands = gui.Multibox(right_tab, "Select Chat Commands")
-local enable_ranks = gui.Checkbox(chat_commands, "enable.ranks", "!ranks", flLastTime)
-local enable_roll = gui.Checkbox(chat_commands, "enable.roll", "!roll", flLastTime)
-local enable_8ball = gui.Checkbox(chat_commands, "enable.8ball", "!8ball", flLastTime)
-local enable_gaydar = gui.Checkbox(chat_commands, "enable.gaydar", "!gay", flLastTime)
-local enable_coin_flip = gui.Checkbox(chat_commands, "enable.flip", "!flip", flLastTime)
-local enable_anime = gui.Checkbox(chat_commands, "enable.anime", "!anime", flLastTime)
-local rainbowcheckbox = gui.Checkbox(rainbow_hudGroup, "enable", "Rainbow Hud",flLastTime)
+local enable_ranks = gui.Checkbox(chat_commands, "enable.ranks", "!ranks", 1)
+local enable_roll = gui.Checkbox(chat_commands, "enable.roll", "!roll", 1)
+local enable_8ball = gui.Checkbox(chat_commands, "enable.8ball", "!8ball", 1)
+local enable_gaydar = gui.Checkbox(chat_commands, "enable.gaydar", "!gay", 1)
+local enable_coin_flip = gui.Checkbox(chat_commands, "enable.flip", "!flip", 1)
+local enable_anime = gui.Checkbox(chat_commands, "enable.anime", "!anime", 1)
+local rainbowcheckbox = gui.Checkbox(rainbow_hudGroup, "enable", "Rainbow Hud",0)
 rainbowcheckbox:SetDescription("Make's your HUD rainbow.")
 local rainbowslider = gui.Slider(rainbow_hudGroup, "interval", "Rainbow HUD Interval", 1, 0, 10, 0.05)
 rainbowslider:SetDescription("Interval of color switch.")
 --[[GUI Stuff End]]--
 
---[[Troll]]--
+--[[Button Switching Legit - Rage]]--
+local key = gui.Keybox (left_tab2, "lua_keybox", "QuickToggle Key",0)
+key:SetDescription("This will switch between Legit and Rage.")
+local pressed = false;
 
---[[Troll End]]--
+callbacks.Register("Draw", function()
+    if key:GetValue() ~= 0 then
+        if input.IsButtonPressed(key:GetValue()) then
+ pressed=true;
+ elseif (pressed and input.IsButtonReleased(key:GetValue())) then
+ pressed=false;
+ if gui.GetValue("rbot.master") then
+ gui.SetValue("rbot.master", false)
+ gui.SetValue("lbot.master", true)
+ else
+ gui.SetValue("rbot.master", true)
+ gui.SetValue("lbot.master", false)
+ end
+ end
+ end
+end)
+--[[Button Swwitching Legit - Rage End]]--
+
+--[[Lobby Troll]]--
+local m_CreateSession = gui.Button(right_tab2, "Create Lobby", function()
+panorama.RunScript("FriendsListAPI.ActionInviteFriend('0', '');") end)
+m_CreateSession:SetWidth(268)
+local m_SpamPopup = gui.Button(right_tab2, "Spam Popup", function()
+    for i=1,100 do
+        panorama.RunScript("PartyListAPI.SessionCommand('Game::HostEndGamePlayAgain', 'run all xuid ' + MyPersonaAPI.GetXuid());")
+    end
+end)
+
+local m_ClosePopups = gui.Button(right_tab2, "Clear Popups", function()
+    panorama.RunScript("UiToolkitAPI.CloseAllVisiblePopups();")
+end)
+m_ClosePopups:SetPosX(141)
+m_ClosePopups:SetPosY(48)
+--[[Lobby Troll End]]--
 
 --[[PannoramaUtil]]--
 panorama.RunScript([[
@@ -143,9 +178,7 @@ panorama.RunScript([[
             check: '\u{2714}',
             times: '\u{2716}',
             warning: '\u{26A0}',
-            location: '\u{25BC}',
-            ball8: '\u{2791}',
-            dice: ['\u{2680}', '\u{2681}', '\u{2682}', '\u{2683}', '\u{2684}', '\u{2685}']
+            location: '\u{25BC}'
         },
 
         regex: {
@@ -1000,28 +1033,6 @@ panorama.RunScript([[
                     users.forEach((x) => {
                         _utils.party(`${ep_globals.symbols.location} ${ep_globals.symbols.bullet} ${x.name} is from ${ep_globals.locations[x.location]}`);
                     });
-                }
-            },
-            {
-                title: '8Ball',
-                cmds: ['8ball', '8b'],
-                enabled: true,
-                exec: (cmd, args, user, steam_id) => {
-                    if (args.length === 0) {
-                        _utils.error('Please provide at least one argument!');
-                        return;
-                    }
-
-                    _utils.party(`${ep_globals.symbols.ball8} ${ep_globals.symbols.bullet} ${Math.round(Math.random()) ? 'Yes' : 'No'}`);
-                }
-            },
-            {
-                title: 'Dice',
-                cmds: ['dice', 'd'],
-                enabled: true,
-                exec: (cmd, args, user, steam_id) => {
-                    const number = Math.round(Math.random() * (6 - 1)) + 1
-                    _utils.party(`${ep_globals.symbols.dice[number - 1]} ${ep_globals.symbols.bullet} ${number}`);
                 }
             }
         ];

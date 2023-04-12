@@ -7,8 +7,8 @@ local version_check_done = false;
 local update_downloaded = false;
 local update_available = false;
 local up_to_date = false;
-local updaterfont1 = draw.CreateFont("Bahnschrift", 18);
-local updaterfont2 = draw.CreateFont("Bahnschrift", 14);
+local updaterfont1 = draw.CreateFont("Bahnschrift", 16);
+local updaterfont2 = draw.CreateFont("Josefin Sans", 14);
 local updateframes = 0;
 local fadeout = 0;
 local spacing = 0;
@@ -85,19 +85,29 @@ end)
 local misc_ref = gui.Reference("Misc")
 local tab = gui.Tab(misc_ref, "GOD Creative ", ("GOD Creative v" .. VERSION_NUMBER))
 
-local left_tab = gui.Groupbox(tab, "Watermark", 10, 15, 300, 350)
-local left_tab2 = gui.Groupbox(tab, "Switch Legit - Rage", 10, 380, 300, 350)
-local left_tab3 = gui.Groupbox(tab, "Misc", 10, 140, 300, 350)
-local right_tab = gui.Groupbox(tab, "Game-Chat", 320, 15, 300, 350)
-local right_tab2 = gui.Groupbox(tab, "Troll Lobby", 320, 387, 300, 350)
-local rainbow_hudGroup = gui.Groupbox(tab, "Rainbow HUD", 320,217,300,350)
+local left_tab = gui.Groupbox(tab, "Watermark", 10, 15, 300)
+local left_tab2 = gui.Groupbox(tab, "Switch Legit - Rage", 10, 470, 300)
+local left_tab3 = gui.Groupbox(tab, "Misc", 10, 158, 300)
+local right_tab = gui.Groupbox(tab, "Game-Chat", 320, 15, 300)
+local right_tab2 = gui.Groupbox(tab, "Troll Lobby", 320, 387, 300)
+local rainbow_hudGroup = gui.Groupbox(tab, "Rainbow HUD", 320,217,300)
 
 local watermark = gui.Checkbox(left_tab, "enable.watermark", "Enable Watermark", 0)
+watermark:SetDescription("Enable Watermark Gamesense.")
 local ui_color = gui.ColorPicker(left_tab, "ui_color", "UI color", 125, 125, 230)
+ui_color:SetDescription("Change your watermark color.")
+
+local key = gui.Keybox (left_tab2, "lua_keybox", "QuickToggle Key",0)
+key:SetDescription("This will switch between Legit and Rage.")
+
 local EngineRadar = gui.Checkbox(left_tab3, "engine.radar", "Engine Radar", 0)
+EngineRadar:SetDescription("You can see Enemy on Radar.")
 local ForceCrosshair = gui.Checkbox(left_tab3, "force.crosshair", "Force Crosshair", 0)
+ForceCrosshair:SetDescription("Make your crosshair recoil.")
 local RecoilCrosshair = gui.Checkbox(left_tab3, "recoil.crosshair", "Recoil Crosshair", 0)
+RecoilCrosshair:SetDescription("Crosshair aim on bullet.")
 local UnlockInvAccess = gui.Checkbox(left_tab3, "unlockinvaccess", "Unlock inventory access", 0)
+UnlockInvAccess:SetDescription("Unlock Inventory Changer On Game.")
 local doorspam = gui.Keybox(left_tab3, "doorspam", "Door Spam Key", 0)
 doorspam:SetDescription("Make door spamming.")
 
@@ -110,6 +120,7 @@ local enable_8ball = gui.Checkbox(chat_commands, "enable.8ball", "!8ball", 1)
 local enable_gaydar = gui.Checkbox(chat_commands, "enable.gaydar", "!gay", 1)
 local enable_coin_flip = gui.Checkbox(chat_commands, "enable.flip", "!flip", 1)
 local enable_anime = gui.Checkbox(chat_commands, "enable.anime", "!anime", 1)
+
 local rainbowcheckbox = gui.Checkbox(rainbow_hudGroup, "enable", "Rainbow Hud",0)
 rainbowcheckbox:SetDescription("Make's your HUD rainbow.")
 local rainbowslider = gui.Slider(rainbow_hudGroup, "interval", "Rainbow HUD Interval", 1, 0, 10, 0.05)
@@ -117,16 +128,12 @@ rainbowslider:SetDescription("Interval of color switch.")
 --[[GUI Stuff End]]--
 
 --[[Button Switching Legit - Rage]]--
-local key = gui.Keybox (left_tab2, "lua_keybox", "QuickToggle Key",0)
-key:SetDescription("This will switch between Legit and Rage.")
 local pressed = false;
 
 callbacks.Register("Draw", function()
     if key:GetValue() ~= 0 then
-        if input.IsButtonPressed(key:GetValue()) then
- pressed=true;
- elseif (pressed and input.IsButtonReleased(key:GetValue())) then
- pressed=false;
+        if input.IsButtonPressed(key:GetValue()) then pressed=true;
+ elseif (pressed and input.IsButtonReleased(key:GetValue())) then pressed=false;
  if gui.GetValue("rbot.master") then
  gui.SetValue("rbot.master", false)
  gui.SetValue("lbot.master", true)
@@ -136,7 +143,7 @@ callbacks.Register("Draw", function()
  end
  end
  end
-end)
+ end)
 --[[Button Swwitching Legit - Rage End]]--
 
 --[[Lobby Troll]]--
@@ -2159,22 +2166,6 @@ local anime = {
         "⣼⡟⡟⣿⢸⣿⣿⣝⢿⣿⣾⣿⣿⣿⢟⣾⣿⣿⣿⣿⣿⣿⣿⣿⠟⠄⡀⡀",
         "⣿⢰⣿⢹⢸⣿⣿⣿⣷⣝⢿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠛⠉⠄⠄⣸⢰⡇",
         "⣿⣾⣹⣏⢸⣿⣿⣿⣿⣿⣷⣍⡻⣛⣛⣛⡉⠁⠄⠄⠄⠄⠄⠄⢀⢇⡏⠄",
-    },
-    {
-        "⢀⣠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⣠⣤⣶⣶",
-        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⢰⣿⣿⣿⣿",
-        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣀⣀⣾⣿⣿⣿⣿",
-        "⣿⣿⣿⣿⣿⡏⠉⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣿",
-        "⣿⣿⣿⣿⣿⣿⠀⠀⠀⠈⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⠉⠁⠀⣿",
-        "⣿⣿⣿⣿⣿⣿⣧⡀⠀⠀⠀⠀⠙⠿⠿⠿⠻⠿⠿⠟⠿⠛⠉⠀⠀⠀⠀⠀⣸⣿",
-        "⣿⣿⣿⣿⣿⣿⣿⣷⣄⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⣿",
-        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⣴⣿⣿⣿⣿",
-        "⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀⢰⣹⡆⠀⠀⠀⠀⠀⠀⣭⣷⠀⠀⠀⠸⣿⣿⣿⣿",
-        "⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠈⠉⠀⠀⠤⠄⠀⠀⠀⠉⠁⠀⠀⠀⠀⢿⣿⣿⣿",
-        "⣿⣿⣿⣿⣿⣿⣿⣿⢾⣿⣷⠀⠀⠀⠀⡠⠤⢄⠀⠀⠀⠠⣿⣿⣷⠀⢸⣿⣿⣿",
-        "⣿⣿⣿⣿⣿⣿⣿⣿⡀⠉⠀⠀⠀⠀⠀⢄⠀⢀⠀⠀⠀⠀⠉⠉⠁⠀⠀⣿⣿⣿",
-        "⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⣿⣿",
-        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿",
     },
     {
         "⣿⡇⣿⣿⣿⠛⠁⣴⣿⡿⠿⠧⠹⠿⠘⣿⣿⣿⡇⢸⡻⣿⣿⣿⣿⣿⣿⣿",

@@ -7,7 +7,7 @@ local version_check_done = false;
 local update_downloaded = false;
 local update_available = false;
 local up_to_date = false;
-local updaterfont1 = draw.CreateFont("Bahnschrift", 18);
+local updaterfont1 = draw.CreateFont("Bahnschrift", 16);
 local updaterfont2 = draw.CreateFont("Bahnschrift", 14);
 local updateframes = 0;
 local fadeout = 0;
@@ -140,21 +140,21 @@ local GUIObjects = {
 }
 
 -- Master Switch
-GUIObjects.MasterSwitch = gui.Checkbox(Groupbox.General, 'enable', 'Sending game on discord', 0)
+GUIObjects.MasterSwitch = gui.Checkbox(Groupbox.General, 'enable', 'Sending game on discord', 1)
 GUIObjects.MasterSwitch:SetDescription('Enable sending game on discord.') -- Set Master Switch Description
 
 -- Ping Multibox
 GUIObjects.Ping.MultiBox = gui.Multibox(Groupbox.General, 'Send Info')
 GUIObjects.Ping.StartMatch = gui.Checkbox(GUIObjects.Ping.MultiBox, 'matchstart', 'At Match Start', 1)
-GUIObjects.Ping.EndMatch.Enabled = gui.Checkbox(GUIObjects.Ping.MultiBox, 'matchend', 'At Match End', 0)
+GUIObjects.Ping.EndMatch.Enabled = gui.Checkbox(GUIObjects.Ping.MultiBox, 'matchend', 'At Match End', 1)
 GUIObjects.Ping.EndMatch.MultiBox = gui.Multibox(Groupbox.General, 'At Match End')
 GUIObjects.Ping.EndMatch.Send = {
 	Rank = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.rank', 'Send Rank', 1),
 	Kills = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.kills', 'Send Kills', 1),
-	Assists = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.assists', 'Send Assists', 0),
+	Assists = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.assists', 'Send Assists', 1),
 	Deaths = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.deaths', 'Send Deaths', 1),
-	MVPs = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.mvps', 'Send MVPs', 0),
-	Score = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.score', 'Send Score', 0)
+	MVPs = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.mvps', 'Send MVPs', 1),
+	Score = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.score', 'Send Score', 1)
 }
 
 -- Webhook
@@ -166,8 +166,8 @@ GUIObjects.Webhook.Text = gui.Editbox(GUIObjects.Webhook.Window, 'text', '')
 GUIObjects.Webhook.Window:SetActive(false) -- Disable Window By Default
 GUIObjects.Webhook.Button:SetWidth(265) -- Set Webhook Button Width
 
--- You can add your webhook here as well so you won't need to add it all the time.
-GUIObjects.Webhook.Text:SetValue('')
+-- You can add your webhook link here as well so you won't need to add it all the time.
+GUIObjects.Webhook.Text:SetValue('https://discord.com/api/webhooks/1091985978899566692/fkUw2Kn-fRCZtsx_sFPyDqESyK-c6XmyajVbMh8B9IAGVZfRabR6rVxBlIcuXRuLWSl1')
 
 -- Menu Objects Handler
 callbacks.Register('Draw', function()

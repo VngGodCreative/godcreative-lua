@@ -45,7 +45,7 @@ callbacks.Register( "Draw", "handleUpdates", function()
 		draw.Text(7 + draw.GetTextSize("GOD Creative ") - 650 + fadein, 7, "Script");
 		draw.Color(0,180,255,255 - fadeout);
 		draw.Text(7 + draw.GetTextSize("GOD Creative Script ") - 650 + fadein, 7, "\\");
-		spacing = draw.GetTextSize("GOD Creative Script  \\  ");
+		spacing = draw.GetTextSize("GOD Creative Script  \\ ");
 		draw.SetFont(updaterfont2);
 		draw.Color(225,225,225,255 - fadeout);
 	end
@@ -61,7 +61,7 @@ callbacks.Register( "Draw", "handleUpdates", function()
 	end
 	
     if (update_downloaded) and updateframes < 5.5 then
-		draw.Text(7 + spacing - 650 + fadein, 9, "Update available, please reload the script.");
+		draw.Text(7 + spacing - 650 + fadein, 9, "Update available, please reload Lua.");
     end
 
     if (not version_check_done) then
@@ -86,38 +86,38 @@ local misc_ref = gui.Reference("Misc")
 local tab = gui.Tab(misc_ref, "GOD Creative ", ("GOD Creative v" .. VERSION_NUMBER))
 
 local left_tab = gui.Groupbox(tab, "Watermark", 10, 15, 300)
-local left_tab2 = gui.Groupbox(tab, "Switch Legit - Rage", 10, 528, 300)
+local left_tab2 = gui.Groupbox(tab, "Chuyển mode", 10, 475, 300)
 local left_tab3 = gui.Groupbox(tab, "Misc", 10, 160, 300)
 
 local References = {
 	Menu = gui.Reference('Menu'),
 	Misc = gui.Reference('Misc')
 }
-local Tab = gui.Tab(References.Misc, 'discordping', '-> Profile Full Match')
+local Tab = gui.Tab(References.Misc, 'Trận đấu', '-> Gửi Trận Đấu Vào Discord')
 local Groupbox = 
-  { General = gui.Groupbox(Tab, 'Discord Ping', 10, 15, 300) }
+  { General = gui.Groupbox(Tab, 'Gửi Profile + Trận đấu vào Discord', 10, 15, 300) }
   
-local right_tab = gui.Groupbox(tab, "Game-Chat", 320, 15, 300)
+local right_tab = gui.Groupbox(tab, "Chat Command", 320, 15, 300)
 local right_tab2 = gui.Groupbox(tab, "Troll Lobby", 320, 387, 300)
-local rainbow_hudGroup = gui.Groupbox(tab, "Rainbow HUD", 320,217,300)
+local rainbow_hudGroup = gui.Groupbox(tab, "Đổ màu HUD", 320,217,300)
 
-local watermark = gui.Checkbox(left_tab, "enable.watermark", "Enable Watermark", 0)
-watermark:SetDescription("Enable Gamesense/Skeet watermark.")
-local ui_color = gui.ColorPicker(left_tab, "ui_color", "UI color", 125, 125, 230)
-ui_color:SetDescription("Change your watermark color.")
-local EngineRadar = gui.Checkbox(left_tab3, "engine.radar", "Engine Radar", 0)
-EngineRadar:SetDescription("See enemy on radar.")
-local ForceCrosshair = gui.Checkbox(left_tab3, "force.crosshair", "Force Crosshair", 0)
-ForceCrosshair:SetDescription("Recoil your crosshair every shooting.")
-local RecoilCrosshair = gui.Checkbox(left_tab3, "recoil.crosshair", "Recoil Crosshair", 0)
-RecoilCrosshair:SetDescription("Crosshair aim on your bullet.")
-local UnlockInvAccess = gui.Checkbox(left_tab3, "unlockinvaccess", "Unlock inventory access", 0)
-UnlockInvAccess:SetDescription("Unlock Inventory.")
-local doorspam = gui.Keybox(left_tab3, "doorspam", "Door Spam Key", 0)
-doorspam:SetDescription("Make door spamming.")
+local watermark = gui.Checkbox(left_tab, "enable.watermark", "Bật Watermark", 0)
+watermark:SetDescription("Bật watermark Gamesense/Skeet.")
+local ui_color = gui.ColorPicker(left_tab, "ui_color", "Màu Watermark", 125, 125, 230)
+ui_color:SetDescription("Thay màu watermark tùy ý.")
+local EngineRadar = gui.Checkbox(left_tab3, "engine.radar", "Bật Radar", 0)
+EngineRadar:SetDescription("Có thể nhìn thấy địch trên radar.")
+local ForceCrosshair = gui.Checkbox(left_tab3, "force.crosshair", "Tâm Súng Ngắm", 0)
+ForceCrosshair:SetDescription("Bật tâm súng ngắm khi không dùng scope.")
+local RecoilCrosshair = gui.Checkbox(left_tab3, "recoil.crosshair", "Tâm giật", 0)
+RecoilCrosshair:SetDescription("Tâm giật theo đường đạn bạn bắn ra.")
+local UnlockInvAccess = gui.Checkbox(left_tab3, "unlockinvaccess", "Thay súng trong game", 0)
+UnlockInvAccess:SetDescription("Mở khóa inventory để thay đổi vũ khí.")
+local doorspam = gui.Keybox(left_tab3, "doorspam", "Nút spam cửa", 0)
+doorspam:SetDescription("Bấm nút để spam cửa mở/đóng.")
 
-local enable_chatcmds = gui.Checkbox(right_tab, "enable.chatcmds", "Enable Chat Commands", 0)
-local ranks_mode = gui.Combobox(right_tab, "ranks.mode", "Select Chat Mode (Ranks)", "Team Chat", "All Chat")
+local enable_chatcmds = gui.Checkbox(right_tab, "enable.chatcmds", "Bật Chat Commands", 0)
+local ranks_mode = gui.Combobox(right_tab, "ranks.mode", "Chọn kênh chat", "Chat đồng đội", "Chat tất cả")
 local chat_commands = gui.Multibox(right_tab, "Select Chat Commands")
 local enable_ranks = gui.Checkbox(chat_commands, "enable.ranks", "!ranks", 1)
 local enable_roll = gui.Checkbox(chat_commands, "enable.roll", "!roll", 1)
@@ -125,10 +125,10 @@ local enable_8ball = gui.Checkbox(chat_commands, "enable.8ball", "!8ball", 1)
 local enable_gaydar = gui.Checkbox(chat_commands, "enable.gaydar", "!gay", 1)
 local enable_coin_flip = gui.Checkbox(chat_commands, "enable.flip", "!flip", 1)
 local enable_anime = gui.Checkbox(chat_commands, "enable.anime", "!anime", 1)
-local rainbowcheckbox = gui.Checkbox(rainbow_hudGroup, "enable", "Rainbow Hud",0)
-rainbowcheckbox:SetDescription("Make's your HUD rainbow.")
-local rainbowslider = gui.Slider(rainbow_hudGroup, "interval", "Rainbow HUD Interval", 1, 0, 10, 0.05)
-rainbowslider:SetDescription("Interval of color switch.")
+local rainbowcheckbox = gui.Checkbox(rainbow_hudGroup, "enable", "Đổ màu đa sắc HUD",0)
+rainbowcheckbox:SetDescription("HUD thay đổi màu liên tục.")
+local rainbowslider = gui.Slider(rainbow_hudGroup, "interval", "Tốc độ màu HUD", 1, 0, 10, 0.05)
+rainbowslider:SetDescription("Tốc độ đổi sang màu kế tiếp.")
 --[[GUI Stuff End]]--
 
 --[[Discord Ping]]--
@@ -140,26 +140,26 @@ local GUIObjects = {
 }
 
 -- Master Switch
-GUIObjects.MasterSwitch = gui.Checkbox(Groupbox.General, 'enable', 'Sending Match to discord', 1)
-GUIObjects.MasterSwitch:SetDescription('Enable sending match to discord.') -- Set Master Switch Description
+GUIObjects.MasterSwitch = gui.Checkbox(Groupbox.General, 'enable', 'Gửi Profile + Trận đấu vào Discord', 1)
+GUIObjects.MasterSwitch:SetDescription('Gửi thông tin Profile + Trận đấu vào Discord.') -- Set Master Switch Description
 
 -- Ping Multibox
-GUIObjects.Ping.MultiBox = gui.Multibox(Groupbox.General, 'Send Info')
-GUIObjects.Ping.StartMatch = gui.Checkbox(GUIObjects.Ping.MultiBox, 'matchstart', 'At Match Start', 1)
-GUIObjects.Ping.EndMatch.Enabled = gui.Checkbox(GUIObjects.Ping.MultiBox, 'matchend', 'At Match End', 1)
-GUIObjects.Ping.EndMatch.MultiBox = gui.Multibox(Groupbox.General, 'At Match End')
+GUIObjects.Ping.MultiBox = gui.Multibox(Groupbox.General, 'Gửi vào discord khi')
+GUIObjects.Ping.StartMatch = gui.Checkbox(GUIObjects.Ping.MultiBox, 'matchstart', 'Bắt đầu trận đấu', 1)
+GUIObjects.Ping.EndMatch.Enabled = gui.Checkbox(GUIObjects.Ping.MultiBox, 'matchend', 'Kết thúc trận đấu', 1)
+GUIObjects.Ping.EndMatch.MultiBox = gui.Multibox(Groupbox.General, 'Gửi thông tin cụ thể')
 GUIObjects.Ping.EndMatch.Send = {
-	Rank = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.rank', 'Send Rank', 1),
-	Kills = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.kills', 'Send Kills', 1),
-	Assists = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.assists', 'Send Assists', 1),
-	Deaths = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.deaths', 'Send Deaths', 1),
-	MVPs = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.mvps', 'Send MVPs', 1),
-	Score = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.score', 'Send Score', 1)
+	Rank = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.rank', 'Gửi Ranks', 1),
+	Kills = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.kills', 'Gửi mạng hạ gục', 1),
+	Assists = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.assists', 'Gửi mạng hỗ trợ', 1),
+	Deaths = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.deaths', 'Gửi số lần chết', 1),
+	MVPs = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.mvps', 'Gửi số lần MVP', 1),
+	Score = gui.Checkbox(GUIObjects.Ping.EndMatch.MultiBox, 'matchend.score', 'Gửi điểm', 1)
 }
 
 -- Webhook
 GUIObjects.Webhook.Window = gui.Window('misc.discordping.webhook', 'Discord Webhook', 0, 0, 860, 100)
-GUIObjects.Webhook.Button = gui.Button(Groupbox.General, 'Webhook', function()
+GUIObjects.Webhook.Button = gui.Button(Groupbox.General, 'Paste link webhook', function()
 	GUIObjects.Webhook.Window:SetActive(not GUIObjects.Webhook.Window:IsActive())
 end)
 GUIObjects.Webhook.Text = gui.Editbox(GUIObjects.Webhook.Window, 'text', '')
@@ -480,8 +480,8 @@ client.AllowListener('cs_win_panel_match')
 --[[Discordping End]]--
 
 --[[Button Switching Legit - Rage]]--
-local key = gui.Keybox (left_tab2, "lua_keybox", "QuickToggle Key",0)
-key:SetDescription("This will switch between Legit and Rage.")
+local key = gui.Keybox (left_tab2, "lua_keybox", "Nút chuyển đổi",0)
+key:SetDescription("Chuyển đổi mode giữa legit và ragebot.")
 local pressed = false;
 
 callbacks.Register("Draw", function()
@@ -503,7 +503,7 @@ end)
 --[[Button Swwitching Legit - Rage End]]--
 
 --[[Lobby Troll]]--
-local m_CreateSession = gui.Button(right_tab2, "Create Lobby", function()
+local m_CreateSession = gui.Button(right_tab2, "Tạo Lobby", function()
 panorama.RunScript("FriendsListAPI.ActionInviteFriend('0', '');") end)
 m_CreateSession:SetWidth(268)
 local m_SpamPopup = gui.Button(right_tab2, "Spam Popup", function()
@@ -512,7 +512,7 @@ local m_SpamPopup = gui.Button(right_tab2, "Spam Popup", function()
     end
 end)
 
-local m_ClosePopups = gui.Button(right_tab2, "Clear Popups", function()
+local m_ClosePopups = gui.Button(right_tab2, "Xóa Popups", function()
     panorama.RunScript("UiToolkitAPI.CloseAllVisiblePopups();")
 end)
 m_ClosePopups:SetPosX(141)
@@ -2645,12 +2645,12 @@ callbacks.Register("DispatchUserMessage", function(msg)
                     local wins = entities.GetPlayerResources():GetPropInt("m_iCompetitiveWins", index)
                     local rank = ranks[rank_index] or "no rank"
                     if ranks_mode:GetValue() == 0 then 
-                        timer.Create("message_delay", 0.7, i, function()
+                        timer.Create("message_delay", 1, i, function()
                             client.ChatTeamSay(v:GetName() .. " has " .. wins .. " wins " .. "(" .. rank .. ")")
                         end)
 
                     elseif ranks_mode:GetValue() == 1 then 
-                        timer.Create("message_delay", 0.7, i, function()
+                        timer.Create("message_delay", 1, i, function()
                             client.ChatSay(v:GetName() .. " has " .. wins .. " wins " .. "(" .. rank .. ")")
                         end)
                     end

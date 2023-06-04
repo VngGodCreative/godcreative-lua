@@ -3,7 +3,7 @@ local author = "Creative";
 local SCRIPT_FILE_NAME = GetScriptName();
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/VngGodCreative/godcreative-lua/main/God%20Creative";
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/VngGodCreative/godcreative-lua/main/version%20update";
-local VERSION_NUMBER = "2";
+local VERSION_NUMBER = "2.1";
 local version_check_done = false;
 local update_downloaded = false;
 local update_available = false;
@@ -90,7 +90,8 @@ local left_tab = gui.Groupbox(tab, "Watermark", 10, 15, 300)
 local left_tab3 = gui.Groupbox(tab, "Misc", 10, 160, 300)
 local right_tab = gui.Groupbox(tab, "Chat Command", 320, 15, 300)
 local right_tab2 = gui.Groupbox(tab, "Troll Lobby", 320, 393, 300)
-local right_tab3 = gui.Groupbox(tab, "Block Bot", 320, 545, 300)
+local right_tab3 = gui.Groupbox(tab, "Block Bot", 320, 652, 300)
+local right_tab4 = gui.Groupbox(tab, "Spin Lobby", 320, 546, 300)
 local rainbow_hudGroup = gui.Groupbox(tab, "Đổ màu HUD", 320,220,300)
 
 local watermark = gui.Checkbox(left_tab, "enable.watermark", "Bật Watermark", false)
@@ -135,6 +136,86 @@ rainbowcheckbox:SetDescription("Make HUD change Color.")
 local rainbowslider = gui.Slider(rainbow_hudGroup, "interval", "Tốc độ màu HUD", 1, 0, 10, 0.05)
 rainbowslider:SetDescription("Change Color Speed.")
 --[[GUI Stuff End]]--
+
+--[[Faceit End match]]--
+--\02 do --\04 xanh la
+--took ffi funktions from FFIChatVoteReveal.lua
+local CHudChat_Printf_Index = 27
+local ChatPrefix = "\02[\07Hit Log]\02 "
+local function FindHudElement(name)
+    local m_Table = mem.FindPattern("client.dll", "B9 ?? ?? ?? ?? 68 ?? ?? ?? ?? E8 ?? ?? ?? ?? 89 46 24")
+    local m_Function = mem.FindPattern("client.dll", "55 8B EC 53 8B 5D 08 56 57 8B F9 33 F6 39")
+
+    if m_Table ~= nil and m_Function ~= nil then
+        return ffi.cast("void*(__thiscall*)(void*, const char*)", m_Function)(ffi.cast("void**", m_Table + 0x1)[0], name)
+    end
+
+    return nil
+end
+local CHudChat = FindHudElement("CHudChat")
+if CHudChat == nil then
+    error("CHudChat is nullptr.")
+end
+local CHudChat_Printf = ffi.cast("void(__cdecl*)(void*, int, int, const char*, ...)", ffi.cast("void***", CHudChat)[0][CHudChat_Printf_Index])
+local function ChatPrint(msg)
+    CHudChat_Printf(CHudChat, 0, 0, " " .. ChatPrefix .. msg)
+end
+
+-- Created by ArtzHarvest - https://aimware.net/forum/user/484354
+local playerDamage = {}
+local localPlayerIndex = client.GetLocalPlayerIndex()
+callbacks.Register("FireGameEvent", "EventHook", function(e)
+    local eventName = e:GetName()
+    if eventName == 'round_announce_match_start' then
+        playerDamage = {}
+    end
+    if eventName == "player_hurt" then
+        local attacker = entities.GetByUserID(e:GetInt("attacker"))
+        local victim = entities.GetByUserID(e:GetInt("userid"))
+        if attacker and victim and attacker:IsPlayer() and victim:IsPlayer() then
+            local attackerIndex = attacker:GetIndex()
+            local victimIndex = victim:GetIndex()
+            if attackerIndex == localPlayerIndex then
+                if not playerDamage[victimIndex] then
+                    playerDamage[victimIndex] = { damageDealt = 0, hitsDealt = 0, damageTaken = 0, hitsTaken = 0 }
+                end
+
+                playerDamage[victimIndex].damageDealt = playerDamage[victimIndex].damageDealt + e:GetInt("dmg_health")
+                playerDamage[victimIndex].hitsDealt = playerDamage[victimIndex].hitsDealt + 1
+            end
+            if victimIndex == localPlayerIndex then
+                if not playerDamage[attackerIndex] then
+                    playerDamage[attackerIndex] = { damageDealt = 0, hitsDealt = 0, damageTaken = 0, hitsTaken = 0 }
+                end
+
+                playerDamage[attackerIndex].damageTaken = playerDamage[attackerIndex].damageTaken + e:GetInt("dmg_health")
+                playerDamage[attackerIndex].hitsTaken = playerDamage[attackerIndex].hitsTaken + 1
+            end
+        end
+    end
+    if eventName == "round_end" then
+        local localPlayer = entities.GetLocalPlayer()
+        for index, damageInfo in pairs(playerDamage) do
+            local player = entities.GetByIndex(index)
+            if player and player:IsPlayer() then
+                local playerName = player:GetName()
+                local playerHealth = player:GetHealth() or 0
+
+                local damageDealt = damageInfo.damageDealt or 0
+                local hitsDealt = damageInfo.hitsDealt or 0
+                local damageTaken = damageInfo.damageTaken or 0
+                local hitsTaken = damageInfo.hitsTaken or 0
+
+                if player:GetTeamNumber() ~= localPlayer:GetTeamNumber() then
+                    local message = string.format("\04: [%d dmg / %d hits] - From: [%d dmg / %d hits] - %s (%d hp)", damageDealt, hitsDealt, damageTaken, hitsTaken, playerName, playerHealth)
+                    ChatPrint(message)
+                end
+            end
+        end
+        playerDamage = {}
+    end
+end)
+--[[Faceit End match End]]--
 
 --[[PannoramaUtil]]--
 panorama.RunScript([[
@@ -1727,6 +1808,7 @@ end)
 local m_CreateSession = gui.Button(right_tab2, "Tạo Lobby", function()
 panorama.RunScript("FriendsListAPI.ActionInviteFriend('0', '');") end)
 m_CreateSession:SetWidth(268)
+
 local m_SpamPopup = gui.Button(right_tab2, "Spam Popup", function()
     for i=1,100 do
         panorama.RunScript("PartyListAPI.SessionCommand('Game::HostEndGamePlayAgain', 'run all xuid ' + MyPersonaAPI.GetXuid());")
@@ -1739,6 +1821,30 @@ end)
 m_ClosePopups:SetPosX(141)
 m_ClosePopups:SetPosY(48)
 --[[Lobby Troll End]]--
+
+--[[Spin lobby]]--
+local startspin = gui.Button(right_tab4, "Start Spin", function() 
+    panorama.RunScript([[
+        var ItemPreviewPanel = $.GetContextPanel().FindChildTraverse("JsMainmenu_Vanity");
+
+        if (ItemPreviewPanel != null) {
+            ItemPreviewPanel.SetSceneRotation(0, 15, 0);
+        }
+    ]]);
+end);
+
+local stopspin = gui.Button(right_tab4, "Stop Spin", function() 
+    panorama.RunScript([[
+        var ItemPreviewPanel = $.GetContextPanel().FindChildTraverse("JsMainmenu_Vanity");
+
+        if (ItemPreviewPanel != null) {
+            ItemPreviewPanel.SetSceneRotation(0, 0, 0);
+        }
+    ]]);
+end);
+stopspin:SetPosX(141)
+stopspin:SetPosY(0)
+--[[Spin lobby End]]--
 
 --[[RAINBOW HUD START]]--
 local color = 1
